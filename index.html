@@ -101,6 +101,22 @@
 .cb-taskrow{display:flex;align-items:center;gap:8px;margin:9px 0}.cb-taskrow input{flex:1;min-width:0}.cb-status{font-size:13px;color:#475569}
 @media(max-width:900px){.cb-board{padding:10px}.cb-left{min-width:140px;width:24%}.cb-main{gap:8px}.cb-panel{padding:8px}.cb-top{flex-wrap:wrap}}
 
+
+/* 全班完成時，少量公告自動佔滿公告面板；不影響一般學生大屏及聯絡簿 */
+.cb-spotlight-panel{overflow:hidden}
+.cb-spotlight-list{flex:1;min-height:0;display:grid;grid-auto-rows:minmax(0,1fr);gap:clamp(8px,1.2vh,18px);overflow:auto}
+.cb-spotlight-entry{min-height:0;overflow:hidden;justify-content:center;align-items:center;position:relative}
+.cb-spotlight-text{flex:1;min-width:0;overflow-wrap:anywhere;word-break:break-word;text-align:center;line-height:1.35;font-size:clamp(21px,2.1vw,38px)}
+.cb-spotlight-index{width:clamp(32px,3vw,52px);height:clamp(32px,3vw,52px);font-size:clamp(18px,1.6vw,29px)}
+.cb-spotlight-priority{font-size:clamp(12px,.95vw,17px)}
+.cb-count-1 .cb-spotlight-text{font-size:clamp(30px,3.6vw,68px)}
+.cb-count-1 .cb-spotlight-index{width:clamp(44px,4vw,72px);height:clamp(44px,4vw,72px);font-size:clamp(23px,2.3vw,40px)}
+.cb-count-2 .cb-spotlight-text{font-size:clamp(26px,2.9vw,54px)}
+.cb-count-3 .cb-spotlight-text{font-size:clamp(24px,2.5vw,46px)}
+.cb-count-4 .cb-spotlight-text{font-size:clamp(21px,2.0vw,38px)}
+.cb-count-5 .cb-spotlight-text{font-size:clamp(18px,1.6vw,30px)}
+@media(max-height:680px){.cb-count-1 .cb-spotlight-text{font-size:clamp(24px,3vw,52px)}.cb-spotlight-list{gap:6px}}
+
     </style>
 </head>
 <body class="h-screen w-screen overflow-hidden text-slate-100 bg-slate-950">
@@ -474,21 +490,21 @@
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
                                 <!-- 班級公告區塊 -->
-                                <div class="bg-slate-900/90 border border-indigo-500/40 rounded-2xl p-4 flex flex-col gap-3 shadow-lg">
+                                <div class="bg-slate-900/90 border border-indigo-500/40 rounded-2xl p-4 flex flex-col gap-3 shadow-lg min-h-0 cb-spotlight-panel">
                                     <h3 class="text-lg font-black text-indigo-300 flex items-center gap-2 border-b border-indigo-500/30 pb-2">
                                         <i class="fa-solid fa-clipboard-list text-indigo-400"></i> 班級公告事項
                                     </h3>
                                     <div v-if="activeHomeworkList.length === 0" class="text-slate-400 text-sm font-bold italic py-4 text-center">
                                         ✨ 今日無班級公告
                                     </div>
-                                    <div v-else class="flex flex-col gap-2.5 overflow-y-auto max-h-80">
+                                    <div v-else class="cb-spotlight-list" :class="'cb-count-' + Math.min(activeHomeworkList.length, 5)">
                                         <div v-for="(hw, idx) in activeHomeworkList" :key="idx" 
-                                             :class="['p-3 rounded-xl flex items-center gap-3 shadow border-l-4', announcementClasses(hw)]">
-                                            <span class="w-8 h-8 bg-amber-400 text-slate-950 font-black rounded-lg text-base flex items-center justify-center shrink-0">
+                                             :class="['cb-spotlight-entry p-3 rounded-xl flex items-center gap-3 shadow border-l-4', announcementClasses(hw)]">
+                                            <span class="cb-spotlight-index bg-amber-400 text-slate-950 font-black rounded-lg flex items-center justify-center shrink-0">
                                                 {{ idx + 1 }}
                                             </span>
-                                            <span class="text-base font-bold leading-relaxed" :class="{'line-through opacity-55':hw.crossed}">{{ hw.text }}</span>
-                                            <span class="ml-auto shrink-0 text-xs font-black">{{ hw.crossed ? '✓ 已完成' : announcementLabel(hw) }}</span>
+                                            <span class="cb-spotlight-text font-bold leading-relaxed" :class="{'line-through opacity-55':hw.crossed}">{{ hw.text }}</span>
+                                            <span class="cb-spotlight-priority ml-auto shrink-0 font-black">{{ hw.crossed ? '✓ 已完成' : announcementLabel(hw) }}</span>
                                         </div>
                                     </div>
                                 </div>
