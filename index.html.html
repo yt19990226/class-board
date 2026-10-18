@@ -1,0 +1,2169 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧班級大屏公佈欄 - 五年級導師專用</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Vue 3 CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Font (Noto Sans TC) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Iansui&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            user-select: none;
+            overflow: hidden;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.88);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .pulse-subtle {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.88; transform: scale(0.99); }
+        }
+        .glow-rose {
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.35);
+        }
+        .glow-amber {
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.35);
+        }
+        .glow-purple {
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.35);
+        }
+        .glow-emerald {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+        }
+        .glow-indigo {
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.4);
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+/* 聯絡簿獨立樣式，不改動原大屏 */
+.cb-font{font-family:'Iansui','DFKai-SB','Noto Serif TC',serif}
+.cb-board{position:fixed;inset:0;z-index:35;background:radial-gradient(ellipse at 45% 15%,#13614a,#063d31 70%,#032e26);display:flex;flex-direction:column;padding:14px 22px 18px;color:#f8fafc}
+.cb-top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex:none;border-bottom:2px solid #8dba9d65;padding:3px 0 12px}
+.cb-btn{border:1px solid #9dc7a1aa;background:#185a47;border-radius:11px;padding:8px 13px;font-weight:bold;color:white;cursor:pointer}
+.cb-btn:hover{background:#23775b}.cb-main{display:flex;gap:20px;min-height:0;flex:1;padding-top:14px}
+.cb-left{width:25%;min-width:210px;display:flex;flex-direction:column;gap:14px;min-height:0;overflow:hidden}
+.cb-panel{background:#ffffff0b;border:1px solid #a5c9ac50;border-radius:15px;padding:12px 15px;min-height:0;flex:1;overflow:auto}
+.cb-reminder{padding:8px 0;border-bottom:1px solid #a5c9ac35}
+.cb-reminder:last-child{border-bottom:0}
+.cb-reminder-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:4px}
+.cb-reminder-tag{display:inline-block;background:#fef3c7;color:#5b3608;font-weight:800;font-size:clamp(13px,1.02vw,19px);border-radius:8px;padding:3px 7px;line-height:1.4}
+.cb-reminder-all{font-size:13px;color:#a7f3d0;margin-bottom:3px}
+.cb-panel h3{font-size:clamp(17px,1.5vw,26px);font-weight:bold;margin-bottom:8px}.cb-panel p{font-size:clamp(15px,1.2vw,23px);line-height:1.65;overflow-wrap:anywhere;margin:6px 0}
+.cb-writing{flex:1;min-width:0;min-height:0;overflow:hidden;display:flex;flex-direction:row-reverse;align-items:flex-start;justify-content:flex-start;gap:clamp(7px,1.2vw,24px);padding:8px 4px}
+.cb-column{writing-mode:vertical-rl;text-orientation:upright;white-space:nowrap;display:block;flex:none;font-size:var(--cb-font-size,52px);line-height:1.2;letter-spacing:0.02em;height:max-content;max-height:none}
+.cb-item{unicode-bidi:isolate}
+.cb-item .cb-part{writing-mode:vertical-rl;text-orientation:upright}
+.cb-item .cb-index{display:inline;writing-mode:vertical-rl;text-orientation:upright}
+.cb-writing .cb-column{order:initial}
+/* 日期獨立直向欄：避免 vertical-rl 與 flex-direction:column 混用造成橫向散開 */
+.cb-date{color:#f4f5ed;writing-mode:horizontal-tb;text-orientation:mixed;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:0;white-space:nowrap;line-height:1.14;min-width:1.25em}
+.cb-date .cb-date-part{display:block;writing-mode:horizontal-tb;text-orientation:mixed;white-space:nowrap;text-align:center;line-height:1.14;letter-spacing:0;flex:none}
+.cb-date .cb-date-number{font-size:.87em;letter-spacing:0;line-height:1.18}
+.cb-item{color:#fff}.cb-part{display:inline}.cb-horizontal{display:inline-block;writing-mode:horizontal-tb;text-orientation:mixed;white-space:nowrap;vertical-align:middle;letter-spacing:0;line-height:1.08;font-size:.82em}
+.cb-pages{display:inline-flex;writing-mode:horizontal-tb;text-orientation:mixed;flex-direction:column;align-items:center;vertical-align:middle;white-space:nowrap;line-height:1.04;font-size:.78em;letter-spacing:0;margin:0 2px}
+.cb-pages .cb-line{font-size:.9em;line-height:.95}.cb-index{color:#fef08a}
+.cb-editor{position:fixed;inset:0;z-index:50;background:#020e0bdc;display:flex;align-items:center;justify-content:center;padding:16px}
+.cb-dialog{background:#f8fafc;color:#17212b;width:min(680px,96vw);max-height:92vh;overflow:auto;border-radius:20px;padding:24px;box-shadow:0 20px 70px #0009}
+.cb-input{width:100%;padding:10px 12px;background:white;color:#17212b;border:1px solid #94a3b8;border-radius:9px;font-size:17px}
+.cb-taskrow{display:flex;align-items:center;gap:8px;margin:9px 0}.cb-taskrow input{flex:1;min-width:0}.cb-status{font-size:13px;color:#475569}
+@media(max-width:900px){.cb-board{padding:10px}.cb-left{min-width:140px;width:24%}.cb-main{gap:8px}.cb-panel{padding:8px}.cb-top{flex-wrap:wrap}}
+
+
+/* 全班完成時，少量公告自動佔滿公告面板；不影響一般學生大屏及聯絡簿 */
+.cb-spotlight-panel{overflow:hidden}
+.cb-spotlight-list{flex:1;min-height:0;display:grid;grid-auto-rows:minmax(0,1fr);gap:clamp(8px,1.2vh,18px);overflow:auto}
+.cb-spotlight-entry{min-height:0;overflow:hidden;justify-content:center;align-items:center;position:relative}
+.cb-spotlight-text{flex:1;min-width:0;overflow-wrap:anywhere;word-break:break-word;text-align:center;line-height:1.35;font-size:clamp(21px,2.1vw,38px)}
+.cb-spotlight-index{width:clamp(32px,3vw,52px);height:clamp(32px,3vw,52px);font-size:clamp(18px,1.6vw,29px)}
+.cb-spotlight-priority{font-size:clamp(12px,.95vw,17px)}
+.cb-count-1 .cb-spotlight-text{font-size:clamp(30px,3.6vw,68px)}
+.cb-count-1 .cb-spotlight-index{width:clamp(44px,4vw,72px);height:clamp(44px,4vw,72px);font-size:clamp(23px,2.3vw,40px)}
+.cb-count-2 .cb-spotlight-text{font-size:clamp(26px,2.9vw,54px)}
+.cb-count-3 .cb-spotlight-text{font-size:clamp(24px,2.5vw,46px)}
+.cb-count-4 .cb-spotlight-text{font-size:clamp(21px,2.0vw,38px)}
+.cb-count-5 .cb-spotlight-text{font-size:clamp(18px,1.6vw,30px)}
+@media(max-height:680px){.cb-count-1 .cb-spotlight-text{font-size:clamp(24px,3vw,52px)}.cb-spotlight-list{gap:6px}}
+
+
+/* 2026-10-18：聯絡簿左側公告與提醒隨筆數自適應填滿面板 */
+.cb-left .cb-panel{display:flex;flex-direction:column;overflow:hidden;container-type:size}
+.cb-left .cb-panel h3{flex:none}
+.cb-fill-list{flex:1;min-height:0;display:grid;grid-template-rows:repeat(var(--cb-count,1),minmax(0,1fr));gap:clamp(5px,.65vh,12px);overflow:auto;scrollbar-width:thin}
+.cb-fill-entry{min-height:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;overflow:auto;border-radius:10px;padding:clamp(5px,.6vw,12px);background:#ffffff09;overflow-wrap:anywhere}
+.cb-fill-entry .cb-fill-text{font-size:clamp(16px,3.5cqh,54px);line-height:1.35;font-weight:800;margin:0;overflow-wrap:anywhere;white-space:normal}
+.cb-fill-list.cb-n-1 .cb-fill-text{font-size:clamp(19px,5.5cqh,68px)}
+.cb-fill-list.cb-n-2 .cb-fill-text{font-size:clamp(18px,4.2cqh,54px)}
+.cb-fill-list.cb-n-3 .cb-fill-text{font-size:clamp(17px,3.2cqh,42px)}
+.cb-fill-list.cb-n-4 .cb-fill-text{font-size:clamp(16px,2.6cqh,34px)}
+.cb-fill-list.cb-n-5 .cb-fill-text{font-size:clamp(15px,2cqh,27px)}
+.cb-fill-entry.cb-long .cb-fill-text{font-size:clamp(14px,2.5cqh,34px)}
+.cb-fill-entry.cb-very-long .cb-fill-text{font-size:clamp(13px,1.8cqh,26px)}
+.cb-fill-entry .cb-reminder-tags{justify-content:center;margin:0 0 7px}
+.cb-fill-entry .cb-reminder-tag{font-size:clamp(13px,2.3cqh,26px)}
+.cb-fill-entry .cb-reminder-all{font-size:clamp(12px,1.8cqh,21px)}
+/* 全班完成的大屏：右側提醒比照左側公告，依數量填滿整塊 */
+.cb-reminder-spotlight{min-height:0;overflow:hidden}
+.cb-reminder-spotlight-list{flex:1;min-height:0;display:grid;grid-template-rows:repeat(var(--reminder-count,1),minmax(0,1fr));gap:clamp(8px,1.2vh,18px);overflow:auto}
+.cb-reminder-spotlight-entry{min-height:0;overflow:auto;display:flex;align-items:center;justify-content:center;text-align:center;padding:clamp(10px,1.2vw,24px)}
+.cb-reminder-spotlight-body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(5px,1vh,15px);max-width:100%;min-width:0}
+.cb-reminder-spotlight-meta{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+.cb-reminder-spotlight-time{font-size:clamp(12px,1.1vw,22px);padding:5px 9px}
+.cb-reminder-spotlight-tag{font-size:clamp(14px,1.5vw,29px);padding:4px 11px}
+.cb-reminder-spotlight-text{font-size:clamp(22px,2.9vw,55px);font-weight:900;line-height:1.3;overflow-wrap:anywhere;word-break:break-word}
+.cb-reminder-n-1 .cb-reminder-spotlight-text{font-size:clamp(28px,3.8vw,72px)}
+.cb-reminder-n-2 .cb-reminder-spotlight-text{font-size:clamp(24px,3.1vw,59px)}
+.cb-reminder-n-3 .cb-reminder-spotlight-text{font-size:clamp(22px,2.5vw,46px)}
+.cb-reminder-n-4 .cb-reminder-spotlight-text{font-size:clamp(20px,2.1vw,39px)}
+.cb-reminder-n-5 .cb-reminder-spotlight-text{font-size:clamp(17px,1.7vw,32px)}
+.cb-reminder-spotlight-entry.cb-long .cb-reminder-spotlight-text{font-size:clamp(18px,2.1vw,39px)}
+.cb-reminder-spotlight-entry.cb-very-long .cb-reminder-spotlight-text{font-size:clamp(15px,1.5vw,29px)}
+@media(max-width:900px){.cb-fill-entry .cb-fill-text{font-size:clamp(14px,3cqh,36px)}.cb-reminder-spotlight-text{font-size:clamp(18px,2.3vw,32px)}}
+
+    
+
+/* 聯絡簿左側文字放大：不改版型、色彩與欄位，依每格可用面積和文字長度縮放 */
+.cb-left-new .cb-fill-entry{container-type:size;overflow:hidden}
+.cb-left-new .cb-fill-entry .cb-fill-text{font-size:clamp(19px,min(10cqw,16cqh),74px);line-height:1.27;max-width:100%;max-height:100%;overflow-wrap:anywhere}
+.cb-left-new .cb-fill-list.cb-n-1 .cb-fill-entry .cb-fill-text{font-size:clamp(23px,min(12cqw,21cqh),88px)}
+.cb-left-new .cb-fill-list.cb-n-2 .cb-fill-entry .cb-fill-text{font-size:clamp(21px,min(10.5cqw,18cqh),76px)}
+.cb-left-new .cb-fill-list.cb-n-3 .cb-fill-entry .cb-fill-text{font-size:clamp(19px,min(9cqw,15cqh),64px)}
+.cb-left-new .cb-fill-list.cb-n-4 .cb-fill-entry .cb-fill-text{font-size:clamp(17px,min(8cqw,12cqh),52px)}
+.cb-left-new .cb-fill-list.cb-n-5 .cb-fill-entry .cb-fill-text{font-size:clamp(16px,min(7cqw,10cqh),44px)}
+.cb-left-new .cb-fill-entry.cb-long .cb-fill-text{font-size:clamp(17px,min(7cqw,11cqh),46px)!important}
+.cb-left-new .cb-fill-entry.cb-very-long .cb-fill-text{font-size:clamp(15px,min(5.6cqw,8cqh),34px)!important}
+.cb-left-new .cb-fill-entry .cb-reminder-tags{flex:none;max-width:100%}
+.cb-left-new .cb-fill-entry .cb-reminder-tag{font-size:clamp(12px,min(3.3cqw,5cqh),21px)}
+.cb-left-new .cb-morning-entry .cb-fill-text{color:#0c3767}
+
+/* 聯絡簿新版：左側上下分區，右側直式內容及原編輯器不變 */
+.cb-left-new{width:26%;min-width:250px;gap:12px}
+.cb-left-new .cb-morning-panel{flex:1 1 40%}
+.cb-left-new .cb-news-panel{flex:1 1 60%}
+.cb-left-new .cb-panel{padding:12px;min-height:0}
+.cb-left-new .cb-panel h3{display:flex;align-items:center;justify-content:space-between;gap:5px;font-size:clamp(17px,1.4vw,26px);line-height:1.3}
+.cb-panel-count{font-size:clamp(11px,.85vw,16px);font-weight:700;color:#e2e8f0;background:#ffffff24;border-radius:20px;padding:3px 8px;white-space:nowrap}
+.cb-empty{margin:auto!important;text-align:center;opacity:.65}
+.cb-small-index{display:inline-flex;align-items:center;justify-content:center;border-radius:7px;background:#0284c7;color:#fff;font-size:.65em;min-width:1.45em;height:1.45em;margin-right:.35em;vertical-align:middle}
+.cb-morning-entry{background:#e0f2fe;color:#0c3767}
+.cb-morning-entry .cb-fill-text{color:#0c3767}
+.cb-morning-editor{margin-top:16px;padding:14px 12px;border:1px solid #cbd5e1;border-radius:12px;background:#f1f5f9}
+.cb-morning-editor .cb-btn{font-size:14px}
+@media(max-width:900px){.cb-left-new{min-width:210px;width:30%}.cb-left-new .cb-panel h3{font-size:17px}}
+
+/* 下課大屏：有人待處理時，公告讓出空間給學生，卡片依人數在可用高度內排列 */
+.recess-pending-announcements{max-height:clamp(95px,19vh,190px);overflow:hidden;display:flex;flex-direction:column;min-height:0;padding:10px 14px!important;margin-bottom:8px!important}
+.recess-pending-announcements>div:first-child{flex:none;margin-bottom:3px!important;padding-bottom:3px!important}
+.recess-pending-notice-list{flex:1;min-height:0;max-height:none!important;align-content:flex-start;gap:6px!important}
+.recess-pending-notice-list>div{padding:5px 9px!important;font-size:clamp(13px,1.25vw,19px)!important;line-height:1.25}
+.recess-student-grid{align-content:start!important;grid-auto-rows:minmax(0, min(210px, calc((100% - (var(--recess-rows) - 1) * 12px) / var(--recess-rows))))!important;overflow-y:hidden!important;padding-bottom:0!important}
+.recess-student-card{min-height:0!important;overflow:hidden;gap:2px}
+.recess-student-card h3{font-size:clamp(17px,2.05vw,30px)!important;line-height:1.08}
+@media(max-width:850px){.recess-pending-announcements{max-height:15vh}.recess-student-card h3{font-size:clamp(15px,2.5vw,24px)!important}}
+@media(max-height:780px){.recess-pending-announcements{max-height:14vh;padding:6px 10px!important}.recess-student-card{padding:5px!important}.recess-student-card h3{font-size:clamp(14px,1.8vw,25px)!important}}
+
+/* 無當日公告時直接省略整個公告區；學生名單使用剩餘畫面高度。 */
+@media(max-height:850px){.recess-student-grid{row-gap:8px!important}}
+@media(max-height:680px){.recess-student-card h3{font-size:clamp(13px,1.6vw,24px)!important}}
+</style>
+</head>
+<body class="h-screen w-screen overflow-hidden text-slate-100 bg-slate-950">
+    <div id="app" class="h-full w-full flex flex-col p-2.5 md:p-3 gap-2.5 md:gap-3">
+        
+
+        <!-- 聯絡簿獨立全螢幕頁面：保留原班級大屏所有 DOM 與操作 -->
+        <section v-if="contactBoardOpen" class="cb-board cb-font">
+          <div class="cb-top">
+            <div class="flex items-center gap-3 flex-wrap">
+              <strong style="font-size:clamp(20px,2vw,32px);color:#fde68a">✎ 今日聯絡簿</strong>
+              <button class="cb-btn" @click="contactBoardOpen=false">← 返回班級大屏</button>
+              <button class="cb-btn" @click="openContactEditor">✎ 編輯聯絡簿</button>
+              <button class="cb-btn" @click="contactPreviewDate=contactToday()">顯示今天</button>
+              <input type="date" v-model="contactPreviewDate" aria-label="查看聯絡簿日期" style="background:#f0fdf4;color:#123d31;border-radius:8px;padding:7px" />
+            </div>
+            <strong style="font-size:clamp(16px,1.5vw,25px)">{{ contactDateLabel(contactToday()) }}</strong>
+          </div>
+          <div class="cb-main">
+            <aside class="cb-left cb-left-new">
+              <section class="cb-panel cb-morning-panel">
+                <h3 style="color:#bfdbfe">📘 早修任務 <span class="cb-panel-count">{{contactShownMorning.length}} 項</span></h3>
+                <p v-if="!contactShownMorning.length" class="cb-empty">今天沒有早修任務</p>
+                <div v-else class="cb-fill-list" :class="'cb-n-' + Math.min(contactShownMorning.length,5)" :style="{'--cb-count':contactShownMorning.length}">
+                  <div v-for="(task,i) in contactShownMorning" :key="i" class="cb-fill-entry cb-morning-entry" :class="{'cb-long':task.length>36,'cb-very-long':task.length>75}">
+                    <p class="cb-fill-text"><span class="cb-small-index">{{i+1}}</span>{{task}}</p>
+                  </div>
+                </div>
+              </section>
+              <section class="cb-panel cb-news-panel">
+                <h3 style="color:#fde68a">📢 班級公告與提醒 <span class="cb-panel-count">{{contactCombinedNotices.length}} 則</span></h3>
+                <p v-if="!contactCombinedNotices.length" class="cb-empty">目前沒有公告或提醒</p>
+                <div v-else class="cb-fill-list" :class="'cb-n-' + Math.min(contactCombinedNotices.length,5)" :style="{'--cb-count':contactCombinedNotices.length}">
+                  <div v-for="(item,i) in contactCombinedNotices" :key="item.key" class="cb-fill-entry" :class="{'cb-long':item.text.length>36,'cb-very-long':item.text.length>75}">
+                    <div v-if="item.type==='reminder'" class="cb-reminder-tags">
+                      <span class="cb-reminder-tag">{{ reminderDateTimeLabel(item.raw) }}</span>
+                      <span class="cb-reminder-tag" :class="reminderPriorityClass(item.raw)">{{ reminderPriorityLabel(item.raw) }}</span>
+                      <span v-for="sid in getReminderStudentIds(item.raw)" :key="sid" class="cb-reminder-tag">@{{getStudentTag(sid)}}</span>
+                    </div>
+                    <p class="cb-fill-text" :class="{'line-through opacity-55':item.crossed}" :style="{color:item.type==='reminder'?'#fde68a':item.priority==='critical'?'#fca5a5':item.priority==='urgent'?'#fdba74':'#fef3c7'}">{{item.text}}</p>
+                  </div>
+                </div>
+              </section>
+            </aside>
+            <div class="cb-writing" ref="contactWriting" :style="{'--cb-font-size':contactFontSize+'px'}">
+              <div class="cb-column cb-date"><template v-for="(part,i) in contactDateParts(contactPreviewDate)" :key="i"><span :class="['cb-date-part',part.horizontal?'cb-date-number':'']">{{part.text}}</span></template></div>
+              <div class="cb-column cb-item" v-for="(task,i) in contactShownTasks" :key="i">
+                <span class="cb-index">{{contactCircle(i+1)}}</span>
+                <template v-for="(part,j) in contactTokens(task)" :key="j">
+                  <span v-if="part.type==='pages'" class="cb-pages"><span>{{part.start}}</span><span class="cb-line">│</span><span>{{part.end}}</span></span>
+                  <span v-else :class="part.type==='horizontal'?'cb-horizontal':'cb-part'">{{part.text}}</span>
+                </template>
+              </div>
+              <div v-if="!contactShownTasks.length" style="align-self:center;margin:auto;font-size:30px;color:#d1fae5">這一天尚未編輯聯絡簿</div>
+            </div>
+          </div>
+          <div style="text-align:right;color:#a7d6c3;font-size:12px">{{contactSyncStatus}}　｜　聯絡簿從右往左排列，內容較多時自動縮小字體</div>
+        </section>
+        <div v-if="contactEditorOpen" class="cb-editor" @click.self="contactEditorOpen=false">
+          <div class="cb-dialog">
+            <h2 style="font-size:24px;font-weight:bold;margin-bottom:12px">📖 編輯聯絡簿</h2>
+            <label style="display:block;margin-bottom:8px">編輯日期 <input class="cb-input" type="date" v-model="contactEditDate" @change="loadContactDraft" /></label>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0"><strong>作業內容（由第 1 項開始輸入）</strong><button class="cb-btn" @click="copyContactPrevious">複製前一天</button></div>
+            <div class="cb-taskrow" v-for="(task,i) in contactDraft" :key="i"><b>{{i+1}}.</b><input class="cb-input" v-model="contactDraft[i]" placeholder="例：國練P.22～23" /><button @click="contactDraft.splice(i,1)" style="color:#b91c1c;font-weight:bold">刪除</button></div>
+            <button class="cb-btn" @click="contactDraft.push('')" style="margin-top:8px">＋ 新增一項</button>
+            <div class="cb-morning-editor">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0"><strong>🌅 早修任務（獨立顯示在聯絡簿左上方）</strong><button class="cb-btn" @click="contactMorningDraft.push('')">＋ 新增早修任務</button></div>
+              <div class="cb-taskrow" v-for="(task,i) in contactMorningDraft" :key="'morning_'+i"><b>{{i+1}}.</b><input class="cb-input" v-model="contactMorningDraft[i]" placeholder="例：完成國語L3生字造詞" /><button @click="contactMorningDraft.splice(i,1)" style="color:#b91c1c;font-weight:bold">刪除</button></div>
+            </div>
+            <p class="cb-status" style="margin:14px 0">自動直式排列，P.22～23 會顯示為 P.22／│／P.23；公告與提醒沿用原班級大屏。</p>
+            <p v-if="contactEditorError" style="color:#b91c1c">{{contactEditorError}}</p>
+            <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap"><button class="cb-btn" @click="contactEditorOpen=false">取消</button><button class="cb-btn" @click="saveContactDraft" :disabled="contactSaving">{{contactSaving?'儲存中…':'儲存這一天'}}</button></div>
+          </div>
+        </div>
+
+        <!-- 頂部資訊與控制列 -->
+        <header class="glass-panel rounded-2xl p-2.5 md:p-3 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0 border-b-2 border-indigo-500/50">
+            
+            <!-- 班級名稱與統計數量 -->
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+                <div class="flex items-center gap-2.5">
+                    <div class="bg-gradient-to-tr from-indigo-600 to-violet-500 text-white p-2.5 rounded-xl shadow-md flex items-center justify-center">
+                        <i class="fa-solid fa-chalkboard-user text-xl md:text-2xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <input v-if="isEditingClassName" 
+                                   v-model="className" 
+                                   @blur="isEditingClassName = false; saveAllData()" 
+                                   @keyup.enter="isEditingClassName = false; saveAllData()"
+                                   class="text-xl md:text-2xl font-black text-white bg-slate-800 border-b-2 border-indigo-400 px-2 py-0.5 rounded outline-none"
+                                   ref="classNameInput">
+                            <h1 v-else 
+                                @click="editClassName" 
+                                class="text-xl md:text-2xl font-black tracking-wide cursor-pointer text-indigo-200 hover:text-white transition flex items-center gap-2"
+                                title="點擊修改班級名稱">
+                                {{ className }}
+                                <i class="fa-solid fa-pen-to-square text-xs text-slate-400 opacity-60"></i>
+                            </h1>
+
+                            <!-- 快捷修改名單按鈕 -->
+                            <button @click="openRosterModal" 
+                                    class="ml-1 bg-indigo-800/80 hover:bg-indigo-700 text-indigo-100 text-xs px-2.5 py-1 rounded-lg border border-indigo-400/50 flex items-center gap-1 font-bold transition shadow" 
+                                    title="快速修改全班學生姓名與座號">
+                                <i class="fa-solid fa-user-pen text-amber-300"></i> 修改名單 ({{ students.length }}人)
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-1.5 mt-0.5 text-xs font-bold flex-wrap">
+                            <span class="bg-slate-800/80 text-slate-300 px-2 py-0.5 rounded-md border border-slate-700">
+                                全班 <strong class="text-indigo-400">{{ students.length }}</strong> 人
+                            </span>
+                            <span class="bg-rose-950/80 text-rose-300 px-2 py-0.5 rounded-md border border-rose-800/60">
+                                缺交 <strong class="text-rose-400">{{ missingTotalCount }}</strong> 項
+                            </span>
+                            <span class="bg-amber-950/80 text-amber-300 px-2 py-0.5 rounded-md border border-amber-800/60">
+                                待訂正 <strong class="text-amber-400">{{ correctionTotalCount }}</strong> 項
+                            </span>
+                            <span class="bg-purple-950/80 text-purple-300 px-2 py-0.5 rounded-md border border-purple-800/60">
+                                待補簽名 <strong class="text-purple-400">{{ signatureTotalCount }}</strong> 項
+                            </span>
+                            <!-- 雲端登入按鈕 -->
+                            <button v-if="cloudUser" @click="logoutCloud" class="text-[11px] bg-slate-700 px-2 py-1 rounded-lg" title="登出雲端帳號">登出雲端</button>
+                            <!-- 雲端同步狀態標籤 -->
+                            <span :class="[
+                                'px-2 py-0.5 rounded-md border flex items-center gap-1 text-[11px]',
+                                isCloudConnected ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800/60' : 'bg-sky-950/80 text-sky-300 border-sky-800/60'
+                            ]" title="多載具（手機/平板/電腦/大屏）即時連線與同步中">
+                                <i class="fa-solid" :class="isCloudConnected ? 'fa-cloud-circle-check text-emerald-400 animate-pulse' : 'fa-cloud text-sky-400'"></i>
+                                <span>{{ isCloudConnected ? '雲端即時同步中' : '本地模式' }}</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button @click="openContactBoard" class="px-3 py-1.5 rounded-xl font-bold text-xs md:text-sm bg-emerald-800 hover:bg-emerald-700 text-white border border-emerald-400/50"><i class="fa-solid fa-book-open"></i> 今日聯絡簿</button>
+                    <!-- 模式切換鈕：下課醒目大屏模式 -->
+                    <button @click="isRecessMode = !isRecessMode" 
+                            :class="[
+                                'px-3 py-1.5 rounded-xl font-bold text-xs md:text-sm transition flex items-center gap-1.5 shadow-md border',
+                                isRecessMode ? 'bg-amber-500 hover:bg-amber-600 text-slate-950 border-amber-300 pulse-subtle' : 'bg-slate-800 hover:bg-slate-700 text-indigo-300 border-indigo-500/30'
+                            ]">
+                        <i class="fa-solid" :class="isRecessMode ? 'fa-table-cells text-slate-950' : 'fa-tv'"></i>
+                        <span>{{ isRecessMode ? '離開大屏模式' : '下課大屏模式' }}</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 時間與視覺化動態類比/數位時鐘 -->
+            <div class="flex items-center gap-3 bg-slate-900/90 text-white px-3.5 py-1.5 rounded-xl border border-slate-700/60 w-full sm:w-auto justify-between sm:justify-end">
+                <div class="relative w-10 h-10 md:w-11 md:h-11 bg-slate-800 rounded-full border border-slate-600 flex items-center justify-center shrink-0 shadow-inner">
+                    <canvas ref="analogClockCanvas" width="44" height="44" class="w-full h-full"></canvas>
+                </div>
+                <div class="text-right">
+                    <div class="text-[11px] text-indigo-300 font-medium tracking-wider flex items-center justify-end gap-1.5">
+                        <span>{{ currentDateString }}</span>
+                        <span class="bg-indigo-900/80 text-indigo-200 px-1.5 py-0.2 rounded text-[10px]">{{ currentDayOfWeek }}</span>
+                    </div>
+                    <div class="text-xl md:text-2xl font-black tracking-tight font-mono text-emerald-400">
+                        {{ currentTimeString }}
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 flex flex-col md:flex-row gap-2.5 md:gap-3 overflow-hidden min-h-0">
+            
+            <!-- 左側導師工具面板 (在大屏下課模式隱藏) -->
+            <aside v-show="!isRecessMode" class="w-full md:w-72 lg:w-80 flex flex-col gap-2.5 shrink-0 overflow-y-auto pr-1">
+                
+                <!-- 🌟 快速批次登記工具 (三個主要欄位：訂正 / 缺交 / 補簽名) 🌟 -->
+                <div class="glass-panel rounded-2xl p-3 shadow-sm flex flex-col gap-2 border border-amber-500/30">
+                    <div class="flex items-center justify-between">
+                        <h2 class="font-bold text-amber-300 flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-bolt text-amber-400"></i> 快速連點標記欄位
+                        </h2>
+                        <span v-if="batchMode.active" class="text-[11px] bg-amber-500 text-slate-950 font-black px-2 py-0.5 rounded-full pulse-subtle">
+                            連點中: {{ batchTypeName }} - {{ batchMode.subject || '自訂' }}
+                        </span>
+                    </div>
+
+                    <!-- 選擇登記類別 (訂正 / 缺交 / 補簽名) -->
+                    <div class="flex gap-1 p-1 bg-slate-900/90 rounded-xl border border-slate-700 text-xs">
+                        <label :class="['flex-1 py-1 px-1.5 rounded-lg font-bold text-center cursor-pointer transition flex items-center justify-center gap-1', batchMode.type === 'correction' ? 'bg-amber-500 text-slate-950 font-black shadow' : 'text-slate-400 hover:text-slate-200']">
+                            <input type="radio" value="correction" v-model="batchMode.type" class="hidden">
+                            <span>🟡 訂正</span>
+                        </label>
+                        <label :class="['flex-1 py-1 px-1.5 rounded-lg font-bold text-center cursor-pointer transition flex items-center justify-center gap-1', batchMode.type === 'missing' ? 'bg-rose-600 text-white font-black shadow' : 'text-slate-400 hover:text-slate-200']">
+                            <input type="radio" value="missing" v-model="batchMode.type" class="hidden">
+                            <span>🔴 缺交</span>
+                        </label>
+                        <label :class="['flex-1 py-1 px-1.5 rounded-lg font-bold text-center cursor-pointer transition flex items-center justify-center gap-1', batchMode.type === 'signature' ? 'bg-purple-600 text-white font-black shadow' : 'text-slate-400 hover:text-slate-200']">
+                            <input type="radio" value="signature" v-model="batchMode.type" class="hidden">
+                            <span>🟣 補簽名</span>
+                        </label>
+                    </div>
+
+                    <!-- 自訂科目名稱與開關連點 -->
+                    <div class="flex gap-1.5 my-0.5">
+                        <input v-model="batchMode.subject" 
+                               placeholder="輸入項目 (例: 國習, 聯絡簿)..." 
+                               class="flex-1 text-xs bg-slate-900/90 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-100 outline-none focus:border-amber-400">
+                        <button @click="toggleCustomBatchMode" 
+                                :class="[
+                                    'text-xs font-bold px-3 py-1.5 rounded-lg transition border shrink-0 flex items-center gap-1.5 shadow',
+                                    batchMode.active ? 'bg-amber-500 text-slate-950 border-amber-300 font-black pulse-subtle' : 'bg-indigo-600 hover:bg-indigo-500 text-white border-indigo-400/50'
+                                ]">
+                            <i class="fa-solid" :class="batchMode.active ? 'fa-pause' : 'fa-play'"></i>
+                            <span>{{ batchMode.active ? '結束連點' : '開啟連點' }}</span>
+                        </button>
+                    </div>
+
+                    <!-- 常用科目快捷標籤 -->
+                    <div class="flex flex-wrap gap-1 mt-0.5">
+                        <button v-for="subj in defaultSubjects" 
+                                :key="subj"
+                                @click="selectBatchSubject(subj)"
+                                :class="[
+                                    'py-1 px-2 rounded-lg text-[11px] font-bold transition border',
+                                    batchMode.subject === subj && batchMode.active ? 'bg-amber-500 text-slate-950 border-amber-300 font-black shadow' : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border-slate-700'
+                                ]">
+                            {{ subj }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 班級大屏小工具箱 -->
+                <div class="glass-panel rounded-2xl p-3 shadow-sm flex flex-col gap-2">
+                    <h2 class="font-bold text-sky-300 flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-toolbox text-sky-400"></i> 大屏互動工具
+                    </h2>
+                    <div class="grid grid-cols-3 gap-1.5">
+                        <button @click="openRandomPicker" class="p-2 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white rounded-xl font-bold text-xs shadow flex items-center justify-center gap-1.5 transition">
+                            <i class="fa-solid fa-dice text-sm"></i> 班級抽籤
+                        </button>
+                        <button @click="openGroupShuffle" class="p-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl font-bold text-xs shadow flex items-center justify-center gap-1.5 transition">
+                            <i class="fa-solid fa-shuffle text-sm"></i> 小組排序
+                        </button>
+                        <button @click="openTimer" class="p-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl font-bold text-xs shadow flex items-center justify-center gap-1.5 transition">
+                            <i class="fa-solid fa-stopwatch text-sm"></i> 課堂計時
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 統一公告與提醒管理（原班級公告已整合） -->
+                <div class="glass-panel rounded-2xl p-3 shadow-sm flex flex-col gap-2 border border-amber-500/20">
+                    <div class="flex items-center justify-between">
+                        <h2 class="font-bold text-amber-300 flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-clock-rotate-left text-amber-400"></i> 班級公告與提醒事項
+                        </h2>
+                        <span class="text-[10px] bg-amber-950/80 text-amber-300 px-2 py-0.5 rounded-md border border-amber-800/60 font-bold">
+                            {{ activeRemindersCount }} 項待提醒
+                        </span>
+                    </div>
+
+                    <!-- 全班公告無需指定學生或時間；需要定時響鈴才填時間 -->
+                    <div class="flex flex-col gap-1.5">
+                        <div class="flex gap-1.5">
+                            <input v-model="newReminderDate" type="date" class="w-1/2 text-xs bg-slate-900/90 border border-slate-700 rounded-lg px-2 py-1 text-amber-300 outline-none focus:border-amber-400" title="選擇提醒日期">
+                            <input v-model="newReminderTime" type="time" class="w-1/2 text-xs bg-slate-900/90 border border-slate-700 rounded-lg px-2 py-1 text-amber-300 outline-none focus:border-amber-400" title="選擇提醒時間">
+                        </div>
+                        <div class="flex items-center gap-2 rounded-lg border border-amber-500/30 bg-slate-900/70 px-2 py-1.5">
+                            <label class="text-xs text-amber-300 font-bold shrink-0">緊急程度</label>
+                            <select v-model="newReminderPriority" class="flex-1 min-w-0 bg-slate-900 text-amber-100 border border-slate-600 rounded-lg px-2 py-1 text-xs">
+                                <option value="critical">🔴 非常緊急</option>
+                                <option value="urgent">🟠 緊急</option>
+                                <option value="normal">🟡 一般</option>
+                            </select>
+                            <span class="text-[10px] text-slate-400">優先顯示緊急事項</span>
+                        </div>
+                        <!-- 可複選的 @學生名單，空白代表全班提醒 -->
+                        <div class="rounded-lg border border-amber-500/40 bg-slate-900/90 p-2">
+                            <div class="flex justify-between items-center gap-2 mb-1.5">
+                                <span class="text-[11px] font-bold text-amber-300">👤 @指定學生（可複選）</span>
+                                <button type="button" @click="newReminderStudentIds = []" class="text-[10px] text-slate-300 hover:text-white underline">清除選取／全班提醒</button>
+                            </div>
+                            <div class="text-[10px] text-amber-200 mb-1">{{ newReminderStudentIds.length ? '已選取 ' + newReminderStudentIds.length + ' 位學生' : '未選取學生：全班提醒' }}</div>
+                            <div class="grid grid-cols-2 gap-1 max-h-28 overflow-y-auto">
+                                <label v-for="s in students" :key="'rem_select_'+s.id" class="flex items-center gap-1 rounded px-1.5 py-1 cursor-pointer text-[11px]" :class="newReminderStudentIds.includes(String(s.id)) ? 'bg-amber-400/25 text-amber-200' : 'text-slate-200 hover:bg-slate-700'">
+                                    <input type="checkbox" :value="String(s.id)" v-model="newReminderStudentIds" class="accent-amber-400">
+                                    <span>{{ s.id }}號 {{ s.name }}</span>
+                                </label>
+                            </div>
+                        </div>
+                        <input v-model="newReminderText" @keyup.enter="addReminder" placeholder="輸入全班公告或指定學生提醒..." class="w-full text-xs bg-slate-900/90 border border-slate-700 rounded-lg px-2 py-1 text-slate-100 outline-none focus:border-amber-400">
+                        <div class="flex gap-1.5">
+                            <button @click="addReminder" class="flex-1 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-lg transition shadow flex items-center justify-center gap-1">
+                                <i class="fa-solid" :class="editingReminderId === null ? 'fa-plus' : 'fa-floppy-disk'"></i> {{ editingReminderId === null ? '新增公告／提醒' : '儲存修改' }}
+                            </button>
+                            <button v-if="editingReminderId !== null" @click="cancelReminderEdit" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-xs">取消編輯</button>
+                        </div>
+                    </div>
+
+                    <!-- 提醒事項清單列表 -->
+                    <div class="flex flex-col gap-1.5 max-h-36 overflow-y-auto mt-0.5">
+                        <div v-if="reminders.length === 0" class="text-[11px] text-slate-400 text-center py-2 italic">
+                            尚無設定提醒事項
+                        </div>
+                        <div v-for="(item, idx) in reminders" :key="item.id" 
+                             :class="[
+                                 'flex items-center justify-between p-1.5 rounded-xl border text-xs transition',
+                                 item.triggered ? 'bg-rose-950/60 border-rose-500/80 text-rose-200 animate-pulse' : 'bg-slate-900/80 border-slate-700/80 text-slate-200'
+                             ]">
+                            <div class="flex flex-col gap-0.5 min-w-0 flex-1">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="bg-amber-500/20 text-amber-300 border border-amber-400/30 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold shrink-0">
+                                        {{ reminderDateTimeLabel(item) }}
+                                    </span>
+                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-bold shrink-0" :class="reminderPriorityClass(item)">{{ reminderPriorityLabel(item) }}</span>
+                                    <span v-for="sid in getReminderStudentIds(item)" :key="'edit_'+sid" class="bg-amber-400 text-slate-950 font-black px-1.5 py-0.5 rounded text-[10px] shrink-0 shadow">
+                                        @{{ getStudentTag(sid) }}
+                                    </span>
+                                </div>
+                                <span class="truncate font-medium text-[11px]" :class="item.triggered ? 'font-bold text-rose-300' : ''">
+                                    {{ item.text }}
+                                </span>
+                            </div>
+                            <button @click="startReminderEdit(item)" class="text-sky-300 hover:text-sky-100 p-1 shrink-0 transition" title="編輯提醒內容、時間與指定學生">
+                                <i class="fa-solid fa-pen-to-square text-xs"></i>
+                            </button>
+                            <button @click="removeReminder(idx)" class="text-slate-400 hover:text-rose-400 p-1 shrink-0 transition" title="刪除提醒">
+                                <i class="fa-solid fa-xmark text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 快捷清空工具 -->
+                <div class="mt-auto">
+                    <button @click="clearAllTasks" class="w-full py-2 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border border-rose-800/50">
+                        <i class="fa-solid fa-trash-arrow-up"></i> 重置全班今日紀錄
+                    </button>
+                </div>
+            </aside>
+
+            <section class="flex-1 glass-panel rounded-2xl p-2.5 md:p-3 shadow-lg flex flex-col overflow-hidden relative border border-slate-700/60">
+                
+                <!-- 下課大屏模式專屬公告區 -->
+                <template v-if="isRecessMode">
+                    <!-- 情況 A：全班皆無待處理項目（所有學生銷號完畢） -->
+                    <div v-if="noPendingTasks && todayReminders.length > 0" class="flex-1 flex flex-col h-full overflow-hidden p-2">
+                        <div class="flex-1 glass-panel rounded-2xl p-5 border-2 border-emerald-500/50 flex flex-col overflow-y-auto glow-emerald gap-4">
+                            
+                            <!-- 頁首標題 -->
+                            <div class="flex items-center justify-between pb-3 border-b border-emerald-500/30 shrink-0">
+                                <h2 class="text-2xl md:text-3xl font-black text-amber-300 flex items-center gap-3">
+                                    <i class="fa-solid fa-bullhorn text-amber-400 text-3xl"></i>
+                                    <span>班級公告與提醒事項</span>
+                                </h2>
+                                <span class="bg-emerald-900/80 text-emerald-200 text-sm px-4 py-1.5 rounded-full border border-emerald-400/40 font-bold flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                                    全班銷號完畢！呈現本日公告與提醒
+                                </span>
+                            </div>
+
+                            <!-- 整合公告與提醒：單一大框，依數量自動填滿 -->
+                            <div class="flex-1 min-h-0 bg-slate-900/90 border border-amber-500/40 rounded-2xl p-4 flex flex-col gap-3 shadow-lg cb-reminder-spotlight">
+                                <h3 class="text-lg font-black text-amber-300 flex items-center gap-2 border-b border-amber-500/30 pb-2 shrink-0">
+                                    <i class="fa-solid fa-bullhorn text-amber-400"></i> 全班公告與指定提醒
+                                </h3>
+                                <div v-if="todayReminders.length === 0" class="flex-1 flex items-center justify-center text-slate-400 font-bold">✨ 目前沒有公告或提醒</div>
+                                <div v-else class="cb-reminder-spotlight-list" :class="'cb-reminder-n-' + Math.min(todayReminders.length,5)" :style="{'--reminder-count':todayReminders.length}">
+                                    <div v-for="r in todayReminders" :key="r.id" class="cb-reminder-spotlight-entry bg-slate-800/80 border border-amber-500/30 rounded-xl shadow" :class="{'cb-long':(r.text||'').length>36,'cb-very-long':(r.text||'').length>75}">
+                                        <div class="cb-reminder-spotlight-body">
+                                            <div class="cb-reminder-spotlight-meta">
+                                                <span class="cb-reminder-spotlight-time bg-amber-500/20 text-amber-300 border border-amber-400/40 rounded-lg font-mono font-bold">{{ reminderDateTimeLabel(r) }}</span>
+                                                <span class="cb-reminder-spotlight-time rounded-lg font-bold" :class="reminderPriorityClass(r)">{{ reminderPriorityLabel(r) }}</span>
+                                                <span v-for="sid in getReminderStudentIds(r)" :key="'panel_'+sid" class="cb-reminder-spotlight-tag bg-amber-400 text-slate-950 font-black rounded-lg shadow">@{{ getStudentTag(sid) }}</span>
+                                                <span v-if="r.triggered" class="text-sm text-emerald-300 border border-emerald-500/40 bg-emerald-950/40 rounded px-2 py-1">已提醒</span>
+                                            </div>
+                                            <span class="cb-reminder-spotlight-text text-slate-100">{{ r.text }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 情況 B：有同學需要處理作業 (隨人數被點掉，公告區與字型動態自動放大) -->
+                    <div v-else-if="todayReminders.length > 0" :class="recessAnnouncementClass.container" class="recess-pending-announcements">
+                        <div class="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-indigo-500/30">
+                            <div class="flex items-center gap-2" :class="recessAnnouncementClass.title">
+                                <i class="fa-solid fa-bullhorn text-amber-400 animate-bounce"></i>
+                                <span class="tracking-wide">班級公告與提醒事項</span>
+                                <span class="text-xs bg-amber-500/20 text-amber-300 border border-amber-400/40 px-2.5 py-0.5 rounded-full font-bold ml-1 flex items-center gap-1">
+                                    <i class="fa-solid fa-arrow-up-right-dots text-amber-400"></i>
+                                    <span>目前顯示 {{ displayedStudents.length }} 位學生（公告自動放大中 🚀）</span>
+                                </span>
+                            </div>
+
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <button @click="openRandomPicker" title="班級隨機抽籤" class="px-2.5 py-1 bg-sky-600/80 hover:bg-sky-500 text-white text-xs font-bold rounded-lg border border-sky-400/40 shadow transition">
+                                    <i class="fa-solid fa-dice"></i> 抽籤
+                                </button>
+                                <button @click="openGroupShuffle" title="小組隨機排序" class="px-2.5 py-1 bg-purple-600/80 hover:bg-purple-500 text-white text-xs font-bold rounded-lg border border-purple-400/40 shadow transition">
+                                    <i class="fa-solid fa-shuffle"></i> 組序
+                                </button>
+                                <button @click="openTimer" title="課堂計時器" class="px-2.5 py-1 bg-emerald-600/80 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg border border-emerald-400/40 shadow transition">
+                                    <i class="fa-solid fa-stopwatch"></i> 計時
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 公告與提醒清單 -->
+                        <div class="recess-pending-notice-list flex flex-wrap items-center gap-2 py-1 overflow-y-auto">
+                            <div v-if="todayReminders.length === 0" class="text-slate-400 font-bold italic" :class="recessAnnouncementClass.item">
+                                ✨ 暫無登記班級公告與提醒事項
+                            </div>
+                            
+                            <div v-for="r in todayReminders" :key="'rec_'+r.id"
+                                 :class="['text-amber-200 border-amber-400/60 bg-amber-950/80 flex items-center gap-2 transition-all duration-500 ease-in-out', recessAnnouncementClass.item]">
+                                <i class="fa-solid fa-bell text-amber-400"></i>
+                                <span class="font-mono font-bold text-amber-300">{{ reminderDateTimeLabel(r) }}</span>
+                                <span class="rounded-lg px-2 py-1 font-bold" :class="reminderPriorityClass(r)">{{ reminderPriorityLabel(r) }}</span>
+                                <span v-for="sid in getReminderStudentIds(r)" :key="'banner_'+sid" class="bg-amber-400 text-slate-950 font-black px-2 py-0.5 rounded-md text-[0.85em]">
+                                    @{{ getStudentTag(sid) }}
+                                </span>
+                                <span>{{ r.text }}</span>
+                                <span v-if="r.triggered" class="text-xs text-emerald-300 border border-emerald-500/40 rounded px-1.5 py-0.5">已提醒</span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- 一般模式 OR 大屏模式（有待處理項目時） -->
+                <template v-if="!isRecessMode || !noPendingTasks">
+                    <!-- 頁面頂部過濾標籤與提示 -->
+                    <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-700/80 shrink-0 flex-wrap gap-2">
+                        <!-- 一般模式下的過濾標籤 -->
+                        <div v-if="!isRecessMode" class="flex items-center gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+                            <button v-for="tab in filterTabs" 
+                                    :key="tab.id"
+                                    @click="activeFilter = tab.id"
+                                    :class="[
+                                        'px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1',
+                                        activeFilter === tab.id ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+                                    ]">
+                                <span>{{ tab.label }}</span>
+                                <span v-if="tab.count !== null" class="px-1.5 py-0.2 rounded-full text-[10px] font-black" :class="tab.badgeClass">
+                                    {{ tab.count }}
+                                </span>
+                            </button>
+                        </div>
+
+                        <!-- 大屏模式下的醒目标題 -->
+                        <div v-else class="flex items-center gap-2 bg-amber-950/80 text-amber-200 px-3 py-1 rounded-xl border border-amber-500/50 shadow">
+                            <i class="fa-solid fa-bell-concierge text-amber-400"></i>
+                            <span class="text-xs font-black">下課大屏模式：優先顯示待處理作業（共 {{ displayedStudents.length }} 人；全部依座號排序）</span>
+                        </div>
+
+                        <!-- 提示訊息 -->
+                        <div class="text-xs font-bold flex items-center gap-1.5 ml-auto" :class="isRecessMode ? 'text-amber-300 animate-pulse' : 'text-slate-400'">
+                            <i class="fa-solid" :class="isRecessMode ? 'fa-hand-pointer text-amber-400 text-sm' : 'fa-lightbulb text-indigo-400'"></i>
+                            <span>{{ isRecessMode ? '👉 請上台點擊【科目標籤】完成銷號！' : (batchMode.active ? '【連點標記中】點擊學生卡片即刻登記【' + batchTypeName + '】' : '點卡片可詳細設定；學生上台點擊標籤可直接銷號！') }}</span>
+                        </div>
+                    </div>
+
+                    <!-- 學生卡片網格 -->
+                    <div class="flex-1 overflow-hidden h-full min-h-0">
+                        <div :style="isRecessMode ? {'--recess-student-count': displayedStudents.length, '--recess-rows': recessGridRows} : {}" :class="[
+                            'w-full h-full gap-2 md:gap-3 overflow-y-auto pr-1 pb-2',
+                            isRecessMode 
+                                ? 'recess-student-grid grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6' 
+                                : 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 auto-rows-max'
+                        ]">
+                            
+                            <div v-for="student in displayedStudents" 
+                                 :key="student.id"
+                                 @click="handleStudentClick(student)"
+                                 :class="[
+                                     'relative rounded-2xl transition-all duration-200 cursor-pointer flex flex-col justify-between border-2 shadow-lg hover:scale-[1.02]',
+                                     isRecessMode ? 'recess-student-card p-2 md:p-2.5' : 'p-2 md:p-3 min-h-[110px] md:min-h-[125px]',
+                                     getStudentCardStyle(student)
+                                 ]">
+                                
+                                <!-- 卡片頂部：座號與一鍵清除 -->
+                                <div class="flex items-center justify-between w-full">
+                                    <span :class="[
+                                        'rounded-xl font-black flex items-center justify-center shadow-md shrink-0',
+                                        isRecessMode ? 'w-6 h-6 text-xs bg-amber-400 text-slate-950 font-black' : 'w-6 h-6 md:w-7 md:h-7 text-xs md:text-sm bg-indigo-600 text-white'
+                                    ]">
+                                        {{ student.id }}
+                                    </span>
+
+                                    <button v-if="hasStudentPending(student)" 
+                                            @click.stop="clearStudentStatus(student)"
+                                            class="w-6 h-6 text-xs bg-slate-800 hover:bg-emerald-500 text-slate-300 hover:text-white rounded-full border border-slate-600 shadow flex items-center justify-center transition shrink-0"
+                                            title="一鍵設為作業全齊">
+                                        <i class="fa-solid fa-check"></i>
+                                    </button>
+                                </div>
+
+                                <!-- 學生姓名：清晰置中與字型適應 -->
+                                <div class="text-center my-1 w-full">
+                                    <h3 :class="[
+                                        'font-black tracking-wide leading-tight truncate',
+                                        isRecessMode ? (!hasStudentPending(student) && getStudentReminders(student).length ? 'text-xl sm:text-2xl md:text-[30px] lg:text-[32px] text-slate-950' : 'text-xl sm:text-2xl md:text-[30px] lg:text-[32px] text-amber-100') : 'text-base md:text-lg text-slate-100'
+                                    ]">
+                                        {{ student.name }}
+                                    </h3>
+                                </div>
+
+                                <!-- 大屏名條：有待處理作業時先專注顯示作業，完成後才顯示個別提醒 -->
+                                <div v-if="isRecessMode && !hasStudentPending(student) && getStudentReminders(student).length" class="w-full flex flex-col gap-1 mb-1" @click.stop>
+                                    <div v-for="r in getStudentReminders(student)" :key="'student_rem_'+r.id" class="rounded-lg border border-yellow-600 bg-yellow-100 text-yellow-950 px-2 py-1 text-[11px] md:text-xs font-bold leading-snug break-words shadow" :title="(r.date || '') + ' ' + (r.time || '') + ' ' + r.text">
+                                        <i class="fa-solid fa-bell text-yellow-700 mr-1"></i>{{ r.text }}
+                                        <span class="block text-[9px] text-yellow-800 font-normal">{{ r.date || '' }} {{ r.time || '' }}</span>
+                                    </div>
+                                </div>
+
+                                <!-- 三大獨立欄位標籤區 (🔴 缺交 / 🟡 訂正 / 🟣 補簽名) -->
+                                <div class="w-full flex flex-wrap gap-1 items-center justify-center min-h-[28px]">
+                                    
+                                    <!-- 🔴 缺交項目 -->
+                                    <template v-if="student.missing && student.missing.length > 0">
+                                        <button v-for="(item, i) in student.missing" :key="'m_'+i" 
+                                                @click.stop="studentSelfCheckoff(student, 'missing', i)"
+                                                :class="[
+                                                    'bg-rose-600 hover:bg-rose-500 active:scale-95 text-white font-black rounded-lg flex items-center gap-0.5 shadow transition border border-rose-400/40 cursor-pointer shrink-0',
+                                                    isRecessMode ? 'text-xs md:text-sm px-2 py-0.5' : 'text-[11px] md:text-xs px-1.5 py-0.5'
+                                                ]"
+                                                :title="'點擊【' + item + '】表示補交完成！'">
+                                            <span>缺:{{ item }}</span>
+                                            <i class="fa-solid fa-check text-[8px] bg-rose-800/90 rounded-full px-0.5"></i>
+                                        </button>
+                                    </template>
+
+                                    <!-- 🟡 待訂正項目 -->
+                                    <template v-if="student.correction && student.correction.length > 0">
+                                        <button v-for="(item, i) in student.correction" :key="'c_'+i" 
+                                                @click.stop="studentSelfCheckoff(student, 'correction', i)"
+                                                :class="[
+                                                    'bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black rounded-lg flex items-center gap-0.5 shadow transition cursor-pointer shrink-0 border border-amber-300',
+                                                    isRecessMode ? 'text-xs md:text-sm px-2 py-0.5' : 'text-[11px] md:text-xs px-1.5 py-0.5'
+                                                ]"
+                                                :title="'點擊【' + item + '】表示訂正完成！'">
+                                            <span>訂:{{ item }}</span>
+                                            <i class="fa-solid fa-check text-[8px] bg-amber-700 text-white rounded-full px-0.5"></i>
+                                        </button>
+                                    </template>
+
+                                    <!-- 🟣 待補簽名項目 -->
+                                    <template v-if="student.signature && student.signature.length > 0">
+                                        <button v-for="(item, i) in student.signature" :key="'s_'+i" 
+                                                @click.stop="studentSelfCheckoff(student, 'signature', i)"
+                                                :class="[
+                                                    'bg-purple-600 hover:bg-purple-500 active:scale-95 text-white font-black rounded-lg flex items-center gap-0.5 shadow transition cursor-pointer shrink-0 border border-purple-300',
+                                                    isRecessMode ? 'text-xs md:text-sm px-2 py-0.5' : 'text-[11px] md:text-xs px-1.5 py-0.5'
+                                                ]"
+                                                :title="'點擊【' + item + '】表示補簽完成！'">
+                                            <span>簽:{{ item }}</span>
+                                            <i class="fa-solid fa-check text-[8px] bg-purple-800 text-white rounded-full px-0.5"></i>
+                                        </button>
+                                    </template>
+
+                                    <!-- 🟢 作業全齊狀態：僅剩提醒時不顯示全齊，以免混淆 -->
+                                    <div v-if="!hasStudentPending(student) && !(isRecessMode && getStudentReminders(student).length)" 
+                                         class="w-full text-center text-emerald-300 font-bold bg-emerald-950/80 rounded-lg border border-emerald-500/50 py-0.5 text-xs flex items-center justify-center gap-1">
+                                        <i class="fa-solid fa-check text-[9px]"></i> 全齊
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </template>
+            </section>
+        </main>
+
+        <!-- 未設定專案時停止操作，避免誤以為資料已儲存 -->
+        <div v-if="!cloudConfigured" class="fixed inset-0 bg-slate-950/95 z-[110] flex items-center justify-center p-4">
+            <div class="glass-panel rounded-2xl p-6 w-full max-w-lg flex flex-col gap-3">
+                <h2 class="text-xl font-black text-amber-300">⚙️ 尚未設定 Firebase</h2>
+                <p class="text-slate-200 text-sm">此網站未偵測到有效 Firebase 設定，請確認設定後再使用。</p>
+                <p class="text-amber-200 text-xs">目前不會儲存任何資料，請勿直接開始輸入正式學生名單。</p>
+            </div>
+        </div>
+        <!-- Firebase 教師登入 -->
+        <div v-if="cloudConfigured && (!cloudUser || cloudInitializing)" class="fixed inset-0 bg-slate-950/95 z-[100] flex items-center justify-center p-4">
+            <div v-if="cloudInitializing && cloudUser" class="glass-panel rounded-2xl p-6 text-indigo-200 font-bold">正在載入你的專屬班級資料…</div>
+            <form v-else @submit.prevent="loginCloud" class="glass-panel rounded-2xl p-6 w-full max-w-sm flex flex-col gap-3">
+                <h2 class="text-xl font-black text-indigo-200">教師雲端登入</h2>
+                <p class="text-sm text-slate-300">每位老師使用自己的教師帳號；同一位老師的多個裝置登入相同帳號即可同步。</p>
+                <input v-model="loginEmail" type="email" required autocomplete="username" placeholder="電子郵件" class="bg-slate-900 border border-slate-600 rounded-lg p-3 text-white">
+                <input v-model="loginPassword" type="password" required autocomplete="current-password" placeholder="密碼" class="bg-slate-900 border border-slate-600 rounded-lg p-3 text-white">
+                <p v-if="cloudError" class="text-rose-300 text-xs">{{ cloudError }}</p>
+                <button type="submit" :disabled="cloudBusy" class="bg-indigo-600 hover:bg-indigo-500 rounded-lg p-3 font-bold">{{ cloudBusy ? '登入中…' : '登入並同步' }}</button>
+            </form>
+        </div>
+        <!-- 首次登入的教師建立獨立班級；不自動帶入其他教師的資料 -->
+        <div v-if="cloudUser && !cloudInitializing && needsClassSetup" class="fixed inset-0 bg-slate-950/95 z-[99] flex items-center justify-center p-4 overflow-y-auto">
+            <div class="glass-panel rounded-2xl p-6 w-full max-w-lg flex flex-col gap-3">
+                <h2 class="text-xl font-black text-indigo-200">🏫 歡迎建立你的專屬班級</h2>
+                <p class="text-xs text-slate-300">登入帳號：{{ cloudEmail }}。每位老師的學生、作業、提醒資料完全分開。</p>
+                <label class="text-sm font-bold">班級名稱</label>
+                <input v-model="setupClassName" placeholder="例如：五年二班" class="bg-slate-900 border border-slate-600 rounded-lg p-3 text-white">
+                <label class="text-sm font-bold">學生姓名（每行一位，可先留白）</label>
+                <textarea v-model="setupRosterText" rows="6" placeholder="王同學&#10;李同學&#10;陳同學" class="bg-slate-900 border border-slate-600 rounded-lg p-3 text-white"></textarea>
+                <p v-if="cloudError" class="text-rose-300 text-xs">{{ cloudError }}</p>
+                <button @click="initializeClass(false)" :disabled="setupBusy" class="bg-indigo-600 hover:bg-indigo-500 rounded-lg p-3 font-bold">{{ setupBusy ? '建立中…' : '建立我的班級' }}</button>
+                <div v-if="legacyBackupAvailable" class="border-t border-slate-700 pt-3 flex flex-col gap-2">
+                    <p class="text-xs text-amber-200">原本的老師若在這台電腦留有舊版資料，可以手動匯入。新老師請勿使用此功能。</p>
+                    <button @click="initializeClass(true)" :disabled="setupBusy" class="bg-amber-800 hover:bg-amber-700 rounded-lg p-2.5 text-sm font-bold">匯入這台電腦的舊版班級資料</button>
+                </div>
+                <button @click="logoutCloud" class="text-xs text-slate-400 underline">切換教師帳號</button>
+            </div>
+        </div>
+        <!-- 巨幅提醒事項全螢幕自動彈出框 -->
+        <div v-if="activeTriggeredReminder" class="fixed inset-0 bg-slate-950/90 backdrop-blur-lg z-50 flex items-center justify-center p-6">
+            <div class="glass-panel w-full max-w-xl rounded-3xl p-8 shadow-2xl text-center flex flex-col items-center gap-5 border-4 border-amber-400 pulse-subtle glow-amber">
+                <div class="w-24 h-24 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center text-5xl animate-bounce shadow-inner border border-amber-400/40">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+                <div>
+                    <span class="bg-amber-500 text-slate-950 font-black text-sm px-3 py-1 rounded-full uppercase tracking-wider">
+                        ⏰ 時間到的提醒事項
+                    </span>
+                    <div v-if="getReminderStudentIds(activeTriggeredReminder).length" class="mt-3 flex flex-wrap justify-center gap-2">
+                        <span v-for="sid in getReminderStudentIds(activeTriggeredReminder)" :key="'alert_'+sid" class="text-xl md:text-2xl font-black bg-amber-400 text-slate-950 px-3 py-1.5 rounded-xl shadow">
+                            @{{ getStudentTag(sid) }}
+                        </span>
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-black text-white mt-3 leading-tight">
+                        {{ activeTriggeredReminder.text }}
+                    </h2>
+                </div>
+                <div class="text-sm font-mono text-amber-300 bg-slate-900/90 px-4 py-2 rounded-xl border border-slate-700">
+                    預定時間：{{ activeTriggeredReminder.date || '今天' }} {{ activeTriggeredReminder.time || '' }}
+                </div>
+                <button @click="dismissTriggeredReminder" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xl rounded-2xl shadow-xl transition transform active:scale-95">
+                    我知道了 / 關閉提醒
+                </button>
+            </div>
+        </div>
+
+        <!-- 彈出模態框：詳細控制面板 -->
+        <div v-if="selectedStudent" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <div class="glass-panel w-full max-w-md rounded-3xl p-5 shadow-2xl flex flex-col gap-4 border border-indigo-500/30">
+                <div class="flex items-center justify-between border-b border-slate-700/80 pb-3">
+                    <div class="flex items-center gap-3">
+                        <span class="w-10 h-10 bg-indigo-600 text-white font-black text-lg rounded-2xl flex items-center justify-center shadow">
+                            {{ selectedStudent.id }}
+                        </span>
+                        <div>
+                            <h2 class="text-2xl font-black text-white">{{ selectedStudent.name }}</h2>
+                            <p class="text-xs text-slate-400">點擊按鈕切換缺交、訂正與補簽名科目</p>
+                        </div>
+                    </div>
+                    <button @click="selectedStudent = null" class="w-8 h-8 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-full flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- 🟡 待訂正項目 -->
+                <div>
+                    <h3 class="text-xs font-bold text-amber-400 mb-1.5 flex items-center gap-1.5">
+                        <i class="fa-solid fa-triangle-exclamation"></i> 待訂正項目：
+                    </h3>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button v-for="subj in defaultSubjects" 
+                                :key="'c_'+subj"
+                                @click="toggleSubject(selectedStudent, 'correction', subj)"
+                                :class="[
+                                    'px-2.5 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1 border',
+                                    selectedStudent.correction.includes(subj) ? 'bg-amber-500 text-slate-950 font-black border-amber-400 shadow' : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                                ]">
+                            <span>{{ subj }}</span>
+                            <i v-if="selectedStudent.correction.includes(subj)" class="fa-solid fa-check text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 🔴 缺交項目 -->
+                <div>
+                    <h3 class="text-xs font-bold text-rose-400 mb-1.5 flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-xmark"></i> 缺交科目：
+                    </h3>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button v-for="subj in defaultSubjects" 
+                                :key="'m_'+subj"
+                                @click="toggleSubject(selectedStudent, 'missing', subj)"
+                                :class="[
+                                    'px-2.5 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1 border',
+                                    selectedStudent.missing.includes(subj) ? 'bg-rose-600 text-white border-rose-500 shadow' : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                                ]">
+                            <span>{{ subj }}</span>
+                            <i v-if="selectedStudent.missing.includes(subj)" class="fa-solid fa-check text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 🟣 待補簽名項目 -->
+                <div>
+                    <h3 class="text-xs font-bold text-purple-400 mb-1.5 flex items-center gap-1.5">
+                        <i class="fa-solid fa-signature"></i> 待補簽名項目：
+                    </h3>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button v-for="subj in defaultSubjects" 
+                                :key="'s_'+subj"
+                                @click="toggleSubject(selectedStudent, 'signature', subj)"
+                                :class="[
+                                    'px-2.5 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1 border',
+                                    selectedStudent.signature.includes(subj) ? 'bg-purple-600 text-white border-purple-400 shadow font-black' : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                                ]">
+                            <span>{{ subj }}</span>
+                            <i v-if="selectedStudent.signature.includes(subj)" class="fa-solid fa-check text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 pt-2 border-t border-slate-800">
+                    <button @click="clearStudentStatus(selectedStudent)" class="flex-1 py-2 bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 rounded-xl font-bold text-xs border border-emerald-700/60 transition">
+                        清除全部（設為作業全齊）
+                    </button>
+                    <button @click="selectedStudent = null" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-xs transition shadow">
+                        確定
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 隨機抽籤 Modal -->
+        <div v-if="showRandomPicker" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <div class="glass-panel w-full max-w-sm rounded-3xl p-5 shadow-2xl text-center flex flex-col gap-4 border border-sky-500/30">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <h2 class="text-base font-black text-sky-300 flex items-center gap-2">
+                        <i class="fa-solid fa-dice text-sky-400"></i> 全班個人幸運抽籤
+                    </h2>
+                    <button @click="showRandomPicker = false" class="text-slate-400 hover:text-white">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="py-6 bg-slate-900 rounded-2xl border border-slate-800 text-white flex flex-col items-center justify-center min-h-[140px]">
+                    <div v-if="pickedStudent" class="animate-bounce">
+                        <span class="text-sky-400 font-bold text-sm block">抽中了！ {{ pickedStudent.id }} 號</span>
+                        <span class="text-3xl font-black text-amber-300 mt-1 block">{{ pickedStudent.name }}</span>
+                    </div>
+                    <div v-else-if="isRolling" class="text-2xl font-black text-sky-300 tracking-wider">
+                        {{ rollingName }}
+                    </div>
+                    <div v-else class="text-slate-400 text-xs font-bold">
+                        點擊下方按鈕隨機抽取學生！
+                    </div>
+                </div>
+
+                <button @click="startRandomPick" :disabled="isRolling" class="py-2.5 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white rounded-xl font-black text-base shadow-lg transition disabled:opacity-50">
+                    {{ isRolling ? '抽取中...' : '🎲 開始個人抽籤' }}
+                </button>
+            </div>
+        </div>
+
+        <!-- 小組隨機排序 Modal -->
+        <div v-if="showGroupShuffleModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <div class="glass-panel w-full max-w-md rounded-3xl p-5 shadow-2xl text-center flex flex-col gap-4 border border-purple-500/30">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <h2 class="text-base font-black text-purple-300 flex items-center gap-2">
+                        <i class="fa-solid fa-shuffle text-purple-400"></i> 1～6 小組發表與任務隨機排序
+                    </h2>
+                    <button @click="showGroupShuffleModal = false" class="text-slate-400 hover:text-white">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5 py-2">
+                    <div v-for="(group, rank) in shuffledGroups" :key="group"
+                         :class="[
+                             'p-3 rounded-2xl flex items-center justify-between border-2 transition-all duration-300 shadow-md',
+                             rank === 0 ? 'bg-amber-500/20 border-amber-400 text-amber-200' :
+                             (rank === 1 ? 'bg-slate-300/20 border-slate-300 text-slate-100' :
+                             (rank === 2 ? 'bg-amber-700/20 border-amber-600 text-amber-300' : 'bg-slate-900/90 border-slate-700 text-slate-200'))
+                         ]">
+                        <span class="text-xs font-black px-2 py-0.5 rounded-lg"
+                              :class="rank === 0 ? 'bg-amber-400 text-slate-950' : (rank === 1 ? 'bg-slate-300 text-slate-950' : (rank === 2 ? 'bg-amber-600 text-white' : 'bg-slate-800 text-slate-400'))">
+                            第 {{ rank + 1 }} 順位
+                        </span>
+                        <span class="text-lg md:text-xl font-black tracking-wide">{{ group }}</span>
+                    </div>
+                </div>
+
+                <button @click="startGroupShuffle" :disabled="isGroupShuffling" class="py-2.5 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500 text-white rounded-xl font-black text-base shadow-lg transition disabled:opacity-50">
+                    {{ isGroupShuffling ? '洗牌中...' : '🎲 重新小組隨機排序' }}
+                </button>
+            </div>
+        </div>
+
+        <!-- 課堂倒數計時器 Modal -->
+        <div v-if="showTimerModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <div class="glass-panel w-full max-w-sm rounded-3xl p-5 shadow-2xl text-center flex flex-col gap-3 border border-emerald-500/30">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <h2 class="text-base font-black text-emerald-300 flex items-center gap-2">
+                        <i class="fa-solid fa-stopwatch text-emerald-400"></i> 課堂倒數計時器
+                    </h2>
+                    <button @click="showTimerModal = false" class="text-slate-400 hover:text-white">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="py-4 bg-slate-950 text-emerald-400 font-mono text-5xl font-black rounded-2xl border border-emerald-900/60 shadow-inner">
+                    {{ formattedTimerMinutes }}:{{ formattedTimerSeconds }}
+                </div>
+
+                <div class="flex justify-center gap-1.5">
+                    <button v-for="m in [1, 3, 5, 10, 15]" :key="m" @click="setTimerMinutes(m)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-indigo-300 rounded-lg font-bold text-xs border border-slate-700">
+                        {{ m }} 分
+                    </button>
+                </div>
+
+                <div class="flex gap-2 mt-1">
+                    <button @click="toggleTimer" class="flex-1 py-2 rounded-xl font-bold text-white shadow transition" :class="isTimerRunning ? 'bg-amber-600 hover:bg-amber-500' : 'bg-emerald-600 hover:bg-emerald-500'">
+                        {{ isTimerRunning ? '暫停' : '開始倒數' }}
+                    </button>
+                    <button @click="resetTimer" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold border border-slate-700">
+                        重置
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 編輯學生名冊 Modal -->
+        <div v-if="showRosterModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <div class="glass-panel w-full max-w-md rounded-3xl p-5 shadow-2xl flex flex-col gap-3 border border-indigo-500/30">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <h2 class="text-base font-black text-amber-300 flex items-center gap-2">
+                        <i class="fa-solid fa-users-gear text-amber-400"></i> 管理全班學生座號與姓名
+                    </h2>
+                    <button @click="showRosterModal = false" class="text-slate-400 hover:text-white">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <p class="text-[11px] text-slate-400">請每行輸入一位學生姓名（按座號 1號、2號 順序）：</p>
+                <textarea v-model="rosterInputText" rows="9" class="w-full text-xs font-sans p-3 bg-slate-900 border border-slate-800 text-slate-200 rounded-xl outline-none focus:border-indigo-400"></textarea>
+
+                <button @click="saveRoster" class="py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-xs shadow transition">
+                    儲存班級名冊
+                </button>
+            </div>
+        </div>
+
+        <!-- Toast 浮動提示 -->
+        <div v-if="toastMessage" class="fixed bottom-6 right-6 bg-slate-900 text-white px-4 py-2.5 rounded-2xl border border-indigo-500/50 shadow-2xl z-50 flex items-center gap-2 text-xs font-bold animate-bounce">
+            <i class="fa-solid fa-circle-check text-emerald-400"></i>
+            <span>{{ toastMessage }}</span>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // 請填入 Firebase 控制台「專案設定 > 網頁應用程式」提供的設定。
+        // Firebase API key 是公開的專案識別設定；資料安全由 Authentication + Firestore Rules 控制。
+        // 這是你的正式班級網站專用版，已設定 Firebase 專案 work-9c852。
+        // 資料依照教師登入 UID 隔離，請勿將教師登入密碼分享給他人。
+        const firebaseConfig = {
+            apiKey: "AIzaSyAulHr5QcoaIXptJ-SQckCw0D-nWcKQ8y0",
+            authDomain: "work-9c852.firebaseapp.com",
+            projectId: "work-9c852",
+            storageBucket: "work-9c852.firebasestorage.app",
+            messagingSenderId: "97143457300",
+            appId: "1:97143457300:web:ee368d6af1ddcdf5b98901",
+            measurementId: "G-2E9PRBCHZ6"
+        };
+        const firebaseReady = Boolean(firebaseConfig.apiKey && firebaseConfig.apiKey !== 'YOUR_API_KEY' &&
+            firebaseConfig.projectId && firebaseConfig.projectId !== 'YOUR_PROJECT_ID' &&
+            firebaseConfig.appId && firebaseConfig.appId !== 'YOUR_APP_ID');
+        let db = null, auth = null;
+        if (firebaseReady) {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+        }
+
+        const { createApp, ref, computed, onMounted, onUnmounted, nextTick, watch } = Vue;
+
+        createApp({
+            setup() {
+                const isCloudConnected = ref(false);
+                const cloudUser = ref(null);
+                const loginEmail = ref('');
+                const loginPassword = ref('');
+                const cloudError = ref('');
+                const cloudBusy = ref(false);
+                const cloudConfigured = firebaseReady;
+                let unsubscribeCloud = null;
+                let cloudLoaded = false;
+                let cloudDocRef = null;
+                const cloudInitializing = ref(true);
+                const needsClassSetup = ref(false);
+                const setupClassName = ref('');
+                const setupRosterText = ref('');
+                const setupBusy = ref(false);
+                const legacyBackupAvailable = ref(!!localStorage.getItem('class_students_data_v5'));
+                const cloudEmail = computed(() => cloudUser.value?.email || '');
+                const resetClassView = () => {
+                    className.value = '我的班級';
+                    students.value = [];
+                    todayHomework.value = [];
+                    reminders.value = [];
+                    activeTriggeredReminder.value = null;
+                    isRecessMode.value = false;
+                };
+                const initializeClass = async (importLegacy = false) => {
+                    if (!cloudUser.value || !cloudDocRef || setupBusy.value) return;
+                    if (importLegacy && !window.confirm('確定要把這台裝置「舊版」的班級資料匯入目前登入的教師帳號嗎？請確認這是你自己的班級資料。')) return;
+                    setupBusy.value = true;
+                    cloudError.value = '';
+                    try {
+                        let payload;
+                        if (importLegacy) {
+                            const oldStudents = JSON.parse(localStorage.getItem('class_students_data_v5') || '[]');
+                            const oldHomework = JSON.parse(localStorage.getItem('today_homework_v3') || '[]');
+                            const oldReminders = JSON.parse(localStorage.getItem('class_reminders_v2') || '[]');
+                            if (!Array.isArray(oldStudents) || !Array.isArray(oldHomework) || !Array.isArray(oldReminders)) throw Error('舊資料格式錯誤');
+                            payload = { className: localStorage.getItem('class_name') || '我的班級', students: oldStudents, todayHomework: oldHomework, reminders: oldReminders, updatedAt: Date.now() };
+                        } else {
+                            const names = setupRosterText.value.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+                            payload = { className: setupClassName.value.trim() || '我的班級', students: names.map((name, i) => ({ id: i + 1, name, missing: [], correction: [], signature: [] })), todayHomework: [], reminders: [], updatedAt: Date.now() };
+                        }
+                        await setDoc(cloudDocRef, payload);
+                        // onSnapshot 會載入剛建立的班級；不從其他帳號或共用本地快取讀取。
+                    } catch (e) {
+                        cloudError.value = '建立班級失敗，請確認網路與權限，或檢查匯入資料。';
+                        console.warn(e);
+                    } finally { setupBusy.value = false; }
+                };
+                const loginCloud = async () => {
+                    if (!auth) return;
+                    cloudError.value = '';
+                    cloudBusy.value = true;
+                    try { await signInWithEmailAndPassword(auth, loginEmail.value.trim(), loginPassword.value); loginPassword.value = ''; }
+                    catch (e) { cloudError.value = '登入失敗：請檢查電子郵件、密碼及 Firebase 設定。'; console.warn(e); }
+                    finally { cloudBusy.value = false; }
+                };
+                const logoutCloud = async () => { if (auth) await signOut(auth); };
+
+
+                // 聯絡簿資料使用同帳號獨立文件 /users/{uid}/board/contactbook，避免改動原大屏 current 文件。
+                const contactBoardOpen=ref(false), contactEditorOpen=ref(false), contactPreviewDate=ref(''), contactEditDate=ref('');
+                const contactMorningBook=ref({}), contactMorningDraft=ref([]);
+                const contactBook=ref({}), contactDraft=ref([]), contactSaving=ref(false), contactEditorError=ref(''), contactSyncStatus=ref('尚未載入'), contactFontSize=ref(60), contactWriting=ref(null);
+                let unsubscribeContact=null, contactDocRef=null;
+                const contactToday=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+                const contactDateObj=s=>new Date((s||contactToday())+'T12:00:00');
+                const contactDateLabel=s=>{const d=contactDateObj(s);return `${d.getFullYear()-1911} 年 ${d.getMonth()+1} 月 ${d.getDate()} 日（星期${'日一二三四五六'[d.getDay()]}）`};
+                const contactDateParts=s=>{const d=contactDateObj(s);return [{text:String(d.getFullYear()-1911),horizontal:true},{text:'年'},{text:String(d.getMonth()+1),horizontal:true},{text:'月'},{text:String(d.getDate()),horizontal:true},{text:'日'},{text:'星'},{text:'期'},{text:'日一二三四五六'[d.getDay()]}]};
+                const contactCircle=i=>i<=20?String.fromCodePoint(9311+i):`${i}.`;
+                const contactShownTasks=computed(()=>Array.isArray(contactBook.value[contactPreviewDate.value])?contactBook.value[contactPreviewDate.value]:[]);
+                const contactShownMorning=computed(()=>Array.isArray(contactMorningBook.value[contactPreviewDate.value])?contactMorningBook.value[contactPreviewDate.value]:[]);
+                // 聯絡簿公告依目前顯示的聯絡簿日期篩選；切換日期時同步切換公告。
+                // 未設定日期的舊提醒視為當日提醒，避免跨日期顯示。
+                const contactCombinedNotices=computed(()=>{
+                    const selectedDate=contactPreviewDate.value||contactToday();
+                    return reminders.value
+                        .map((r,i)=>({r,i}))
+                        .filter(({r})=>(r.date||contactToday())===selectedDate)
+                        .sort((a,b)=>reminderPriorityRank(a.r)-reminderPriorityRank(b.r)||reminderSortKey(a.r).localeCompare(reminderSortKey(b.r))||a.i-b.i)
+                        .map(({r,i})=>({type:'reminder',key:'r'+(r.id||i),text:String(r.text||r.content||r.message||''),raw:r}));
+                });
+                const contactTokens=task=>{
+                    const s=String(task||'');const out=[];
+                    // 範圍頁碼必須優先於普通數字解析，P.22～23 => 上下橫排兩個完整頁碼。
+                    const re=/(P\.?\s*\d+)(?:\s*[～~〜－–—-]\s*)(?:P\.?\s*)?(\d+)|(?:[A-Za-z]+\.?\s*\d+(?:[.\-]\d+)*|\d+(?:[.\-]\d+)*|[A-Za-z]+)/gi;
+                    let pos=0,m;
+                    while((m=re.exec(s))!==null){
+                        for(const ch of Array.from(s.slice(pos,m.index)))out.push({type:'text',text:ch});
+                        if(m[2])out.push({type:'pages',start:m[1].replace(/\s+/g,''),end:'P.'+m[2]});
+                        else out.push({type:'horizontal',text:m[0].replace(/\s+/g,'')});
+                        pos=re.lastIndex;
+                    }
+                    for(const ch of Array.from(s.slice(pos)))out.push({type:'text',text:ch});
+                    return out;
+                };
+                const openContactBoard=()=>{contactPreviewDate.value=contactToday();contactBoardOpen.value=true;nextTick(fitContactText)};
+                const openContactEditor=()=>{contactEditDate.value=contactPreviewDate.value||contactToday();loadContactDraft();contactEditorOpen.value=true};
+                const loadContactDraft=()=>{contactDraft.value=[...(contactBook.value[contactEditDate.value]||[])];contactMorningDraft.value=[...(contactMorningBook.value[contactEditDate.value]||[])];if(!contactDraft.value.length)contactDraft.value=[''];contactEditorError.value=''};
+                const copyContactPrevious=()=>{const d=contactDateObj(contactEditDate.value);d.setDate(d.getDate()-1);const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;contactDraft.value=[...(contactBook.value[k]||[''])];contactMorningDraft.value=[...(contactMorningBook.value[k]||[])]};
+                const saveContactDraft=async()=>{
+                    if(!contactDocRef||!cloudUser.value){contactEditorError.value='請先登入雲端帳號';return}
+                    contactSaving.value=true;contactEditorError.value='';
+                    const draft=contactDraft.value.map(x=>String(x).trim()).filter(Boolean);
+                    const morningDraft=contactMorningDraft.value.map(x=>String(x).trim()).filter(Boolean);
+                    try{
+                        // 對獨立聯絡簿文件採用欄位合併，避免不同日期被覆蓋。
+                        await setDoc(contactDocRef,{days:{[contactEditDate.value]:draft},morningDays:{[contactEditDate.value]:morningDraft},updatedAt:Date.now()},{merge:true});
+                        contactBook.value={...contactBook.value,[contactEditDate.value]:draft};contactMorningBook.value={...contactMorningBook.value,[contactEditDate.value]:morningDraft};contactPreviewDate.value=contactEditDate.value;contactEditorOpen.value=false;contactSyncStatus.value='聯絡簿已儲存至雲端';nextTick(fitContactText);
+                    }catch(e){contactEditorError.value='儲存失敗，請檢查 Firestore 權限與網路';console.warn(e)}finally{contactSaving.value=false}
+                };
+                const fitContactText=()=>{
+                    const el=contactWriting.value;if(!el)return;
+                    const cols=el.querySelectorAll('.cb-column');if(!cols.length)return;
+                    const w=el.clientWidth-10,h=el.clientHeight-14,n=cols.length;
+                    // 從最大字級往下找；用實際 DOM 寬高確認適合一頁顯示。
+                    for(let px=76;px>=24;px-=2){contactFontSize.value=px;el.style.setProperty('--cb-font-size',px+'px');
+                        const total=Array.from(cols).reduce((sum,c)=>sum+c.getBoundingClientRect().width,0)+(n-1)*Math.min(24,Math.max(7,window.innerWidth*.012));
+                        const tallest=Math.max(...Array.from(cols).map(c=>c.getBoundingClientRect().height));
+                        if(total<=w&&tallest<=h)break;
+                    }
+                };
+                watch([contactShownTasks,contactBoardOpen,contactPreviewDate],()=>nextTick(fitContactText),{deep:true});
+                if(typeof window!=='undefined')window.addEventListener('resize',()=>{if(contactBoardOpen.value)fitContactText()});
+
+                // 班級名稱與編輯控制
+                const className = ref('我的班級');
+                const isEditingClassName = ref(false);
+                const classNameInput = ref(null);
+
+                const editClassName = () => {
+                    isEditingClassName.value = true;
+                    nextTick(() => {
+                        if (classNameInput.value) classNameInput.value.focus();
+                    });
+                };
+
+                // 下課大屏模式
+                const isRecessMode = ref(false);
+                // 按實際畫面欄數計算列數：卡片不會因人數少而放大，人數多時縮短高度以免捲動。
+                const recessViewportWidth = ref(window.innerWidth);
+                const syncRecessViewport = () => { recessViewportWidth.value = window.innerWidth; };
+                const recessGridRows = computed(() => {
+                    const w = recessViewportWidth.value;
+                    const cols = w >= 1024 ? 6 : w >= 768 ? 5 : w >= 640 ? 4 : 3;
+                    return Math.max(1, Math.ceil(displayedStudents.value.length / cols));
+                });
+
+                // 常用預設科目
+                const defaultSubjects = ref([
+                    '國習', '國練', '國隨', '數習', '數重', '數八格', '聽寫本', '聯絡簿', '英語卷'
+                ]);
+
+                // Web Audio API 音效
+                const playSound = (type) => {
+                    try {
+                        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                        if (!AudioCtx) return;
+                        const ctx = new AudioCtx();
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+
+                        const now = ctx.currentTime;
+
+                        if (type === 'beep') {
+                            osc.frequency.setValueAtTime(440, now);
+                            gain.gain.setValueAtTime(0.1, now);
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+                            osc.start(now);
+                            osc.stop(now + 0.08);
+                        } else if (type === 'star') {
+                            osc.type = 'triangle';
+                            osc.frequency.setValueAtTime(523.25, now);
+                            osc.frequency.setValueAtTime(659.25, now + 0.08);
+                            osc.frequency.setValueAtTime(783.99, now + 0.16);
+                            osc.frequency.setValueAtTime(1046.50, now + 0.24);
+                            gain.gain.setValueAtTime(0.15, now);
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                            osc.start(now);
+                            osc.stop(now + 0.4);
+                        } else if (type === 'alarm') {
+                            osc.type = 'sawtooth';
+                            osc.frequency.setValueAtTime(880, now);
+                            osc.frequency.setValueAtTime(440, now + 0.2);
+                            osc.frequency.setValueAtTime(880, now + 0.4);
+                            gain.gain.setValueAtTime(0.2, now);
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+                            osc.start(now);
+                            osc.stop(now + 0.6);
+                        }
+                    } catch (e) {}
+                };
+
+                // 預設 29 位學生名冊
+                const initialStudentNames = [
+                    '陳品睿', '林字涵', '黃彥碩', '張品妍', '李柏宇', 
+                    '王語晴', '吳冠霖', '劉芷安', '蔡家豪', '楊雅婷', 
+                    '許秉恩', '鄭羽彤', '謝承翰', '郭沛蓁', '洪聖傑', 
+                    '曾宥蓁', '廖宇翔', '賴思妤', '邱智捷', '周芯語', 
+                    '葉峻廷', '莊詠晴', '江宥廷', '黃莉婷', '蕭博元', 
+                    '潘采潔', '顏廷宇', '簡睿恩', '藍彩甄'
+                ];
+
+                const loadLocalStudents = () => {
+                    const saved = localStorage.getItem('class_students_data_v5');
+                    if (saved) {
+                        try { return JSON.parse(saved); } catch (e) {}
+                    }
+                    return initialStudentNames.map((name, idx) => {
+                        let missing = [];
+                        let correction = [];
+                        let signature = [];
+                        
+                        if (idx === 2) { correction = ['國習', '數習']; } 
+                        if (idx === 6) { signature = ['聯絡簿']; correction = ['聽寫本']; } 
+                        if (idx === 14) { missing = ['國練']; } 
+                        if (idx === 21) { correction = ['數八格']; } 
+                        
+                        return {
+                            id: idx + 1,
+                            name: name,
+                            missing: missing,
+                            correction: correction,
+                            signature: signature
+                        };
+                    });
+                };
+
+                const students = ref([]);
+
+                const todayHomework = ref([]);
+
+                // 定時提醒事項
+                const getTodayStr = () => {
+                    const now = new Date();
+                    const yyyy = now.getFullYear();
+                    const mm = String(now.getMonth() + 1).padStart(2, '0');
+                    const dd = String(now.getDate()).padStart(2, '0');
+                    return `${yyyy}-${mm}-${dd}`;
+                };
+
+                const newReminderText = ref('');
+                const newReminderTime = ref('');
+                const newReminderDate = ref(getTodayStr());
+                const newReminderStudentIds = ref([]);
+                const newReminderPriority = ref('normal');
+                const editingReminderId = ref(null);
+                const activeTriggeredReminder = ref(null);
+
+                const getStudentTag = (studentId) => {
+                    const s = students.value.find(st => String(st.id) === String(studentId));
+                    return s ? `${s.id}號 ${s.name}` : `${studentId}號`;
+                };
+
+                // 相容舊版單人 studentId 及新版多人 studentIds；不更動既有雲端資料。
+                const getReminderStudentIds = (reminder) => {
+                    if (!reminder) return [];
+                    const ids = Array.isArray(reminder.studentIds) ? reminder.studentIds : [];
+                    const legacy = reminder.studentId !== null && reminder.studentId !== undefined && reminder.studentId !== '' ? [reminder.studentId] : [];
+                    return [...new Set([...ids, ...legacy].map(String).filter(Boolean))];
+                };
+                // 個別提醒在下課大屏只顯示當天；不影響教師後台保存的其他日期資料。
+                const getStudentReminders = (student) => reminders.value.filter(r =>
+                    (r.date || getTodayStr()) === getTodayStr() &&
+                    getReminderStudentIds(r).includes(String(student.id))
+                );
+
+                const reminders = ref([]);
+
+                const activeRemindersCount = computed(() => {
+                    return reminders.value.filter(r => !r.triggered).length;
+                });
+
+                // 下課大屏與聯絡簿只顯示「今天」的公告與提醒。
+                // 教師後台仍保留全部日期資料，未來或過期項目不刪除。
+                // 同一天依緊急程度優先、再依時間先後排序。
+                const reminderPriorityRank = r => ({critical:0, urgent:1, normal:2})[r?.priority] ?? 2;
+                const reminderPriorityLabel = r => ({critical:'🔴 非常緊急',urgent:'🟠 緊急',normal:'🟡 一般'})[r?.priority] || '🟡 一般';
+                const reminderPriorityClass = r => ({critical:'bg-red-950/90 text-red-200 border border-red-500/60',urgent:'bg-orange-950/90 text-orange-200 border border-orange-500/60',normal:'bg-amber-950/80 text-amber-200 border border-amber-500/50'})[r?.priority] || 'bg-amber-950/80 text-amber-200 border border-amber-500/50';
+                const reminderDateTimeLabel = r => `${r?.date || getTodayStr()} ${r?.time && r.time !== '全天' ? r.time : '全天'}`;
+                const reminderSortKey = r => `${r?.date || '9999-12-31'}T${r?.time && r.time !== '全天' ? r.time : '00:00'}`;
+                const todayReminders = computed(() => reminders.value.filter(r => (r.date || getTodayStr()) === getTodayStr()).map((r,i)=>({r,i})).sort((a,b)=>
+                    reminderPriorityRank(a.r)-reminderPriorityRank(b.r) ||
+                    reminderSortKey(a.r).localeCompare(reminderSortKey(b.r)) || a.i-b.i
+                ).map(x=>x.r));
+
+                const cancelReminderEdit = () => {
+                    editingReminderId.value = null;
+                    newReminderText.value = '';
+                    newReminderTime.value = '';
+                    newReminderDate.value = getTodayStr();
+                    newReminderStudentIds.value = [];
+                    newReminderPriority.value = 'normal';
+                };
+
+                const startReminderEdit = (item) => {
+                    editingReminderId.value = item.id;
+                    newReminderText.value = item.text || '';
+                    newReminderTime.value = /^\d{2}:\d{2}/.test(item.time || '') ? item.time.slice(0,5) : '';
+                    newReminderDate.value = item.date || getTodayStr();
+                    newReminderStudentIds.value = getReminderStudentIds(item);
+                    newReminderPriority.value = ['critical','urgent','normal'].includes(item.priority) ? item.priority : 'normal';
+                };
+
+                const addReminder = () => {
+                    if (!newReminderText.value.trim()) {
+                        showToast('請輸入提醒事項內容！');
+                        return;
+                    }
+                    const reminderData = {
+                        date: newReminderDate.value || getTodayStr(),
+                        time: newReminderTime.value || '全天',
+                        studentIds: [...newReminderStudentIds.value],
+                        priority: newReminderPriority.value,
+                        text: newReminderText.value.trim()
+                    };
+                    if (editingReminderId.value !== null) {
+                        const target = reminders.value.find(r => r.id === editingReminderId.value);
+                        if (!target) {
+                            showToast('找不到要修改的提醒，請重新選取。');
+                            cancelReminderEdit();
+                            return;
+                        }
+                        const scheduleChanged = target.date !== reminderData.date || target.time !== reminderData.time;
+                        Object.assign(target, reminderData);
+                        if (scheduleChanged) target.triggered = false;
+                        showToast('已儲存提醒修改！');
+                    } else {
+                        reminders.value.push({ id: Date.now() + Math.random(), ...reminderData, triggered: false });
+                        showToast('已新增提醒事項！');
+                    }
+                    cancelReminderEdit();
+                    saveAllData();
+                    playSound('star');
+                };
+
+                const removeReminder = (idx) => {
+                    if (reminders.value[idx]?.id === editingReminderId.value) cancelReminderEdit();
+                    reminders.value.splice(idx, 1);
+                    saveAllData();
+                };
+
+                const checkReminders = () => {
+                    const now = currentTime.value;
+                    const todayStr = getTodayStr();
+                    const currentHHMM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                    
+                    reminders.value.forEach(r => {
+                        const dateMatches = !r.date || r.date === todayStr;
+                        const timeMatches = r.time && r.time === currentHHMM;
+                        
+                        if (dateMatches && timeMatches && !r.triggered) {
+                            r.triggered = true;
+                            activeTriggeredReminder.value = r;
+                            playSound('alarm');
+                            saveAllData();
+                        }
+                    });
+                };
+
+                const dismissTriggeredReminder = () => {
+                    activeTriggeredReminder.value = null;
+                };
+
+                // 相容舊版公告字串；新格式包含 text 與 priority。
+                const normalizeAnnouncements = (items) => (Array.isArray(items) ? items : []).map(item => {
+                    if (typeof item === 'string') return { text: item, priority: 'normal', crossed: false };
+                    return { text: typeof item?.text === 'string' ? item.text : '', priority: ['critical', 'urgent', 'normal'].includes(item?.priority) ? item.priority : 'normal', crossed: item?.crossed === true };
+                });
+                const announcementClasses = (hw) => ({
+                    critical: 'bg-red-950/90 border-red-500 text-red-100',
+                    urgent: 'bg-orange-950/90 border-orange-400 text-orange-100',
+                    normal: 'bg-yellow-950/80 border-yellow-400 text-yellow-100'
+                })[hw.priority] || 'bg-yellow-950/80 border-yellow-400 text-yellow-100';
+                const announcementLabel = (hw) => ({ critical: '🔴 非常緊急', urgent: '🟠 微緊急', normal: '🟡 正常' })[hw.priority] || '🟡 正常';
+                const activeHomeworkList = computed(() => {
+                    const rank = { critical: 0, urgent: 1, normal: 2 };
+                    return todayHomework.value.filter(item => item && item.text && item.text.trim()).slice()
+                        .sort((a, b) => rank[a.priority] - rank[b.priority]);
+                });
+
+                // 批次連點標記模式
+                const batchMode = ref({
+                    active: false,
+                    subject: '國習',
+                    type: 'correction'
+                });
+
+                const batchTypeName = computed(() => {
+                    if (batchMode.value.type === 'correction') return '訂正';
+                    if (batchMode.value.type === 'missing') return '缺交';
+                    if (batchMode.value.type === 'signature') return '補簽名';
+                    return '';
+                });
+
+                const selectBatchSubject = (subject) => {
+                    batchMode.value.subject = subject;
+                    batchMode.value.active = true;
+                    showToast(`已切換並開啟連點標記【${batchTypeName.value}】：${subject}`);
+                };
+
+                const toggleCustomBatchMode = () => {
+                    if (!batchMode.value.subject || !batchMode.value.subject.trim()) {
+                        showToast('請先輸入或點選項目名稱！');
+                        return;
+                    }
+                    batchMode.value.active = !batchMode.value.active;
+                    if (batchMode.value.active) {
+                        showToast(`已開啟連點標記【${batchTypeName.value}】：${batchMode.value.subject}`);
+                    }
+                };
+
+                // Modal 控制
+                const selectedStudent = ref(null);
+                const activeFilter = ref('all');
+                const showRandomPicker = ref(false);
+                const isRolling = ref(false);
+                const rollingName = ref('');
+                const pickedStudent = ref(null);
+
+                // 小組隨機排序
+                const showGroupShuffleModal = ref(false);
+                const isGroupShuffling = ref(false);
+                const shuffledGroups = ref([
+                    '第 1 組', '第 2 組', '第 3 組', '第 4 組', '第 5 組', '第 6 組'
+                ]);
+
+                const openGroupShuffle = () => {
+                    showGroupShuffleModal.value = true;
+                    if (!isGroupShuffling.value) {
+                        startGroupShuffle();
+                    }
+                };
+
+                const startGroupShuffle = () => {
+                    isGroupShuffling.value = true;
+                    let counter = 0;
+                    const maxCount = 15;
+                    const baseGroups = ['第 1 組', '第 2 組', '第 3 組', '第 4 組', '第 5 組', '第 6 組'];
+                    const previousOrder = JSON.stringify(shuffledGroups.value);
+
+                    const interval = setInterval(() => {
+                        let arr = [...baseGroups];
+                        for (let i = arr.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [arr[i], arr[j]] = [arr[j], arr[i]];
+                        }
+
+                        if (counter === maxCount - 1 && JSON.stringify(arr) === previousOrder && arr.length > 1) {
+                            [arr[0], arr[1]] = [arr[1], arr[0]];
+                        }
+
+                        shuffledGroups.value = arr;
+                        playSound('beep');
+                        counter++;
+
+                        if (counter >= maxCount) {
+                            clearInterval(interval);
+                            isGroupShuffling.value = false;
+                            playSound('star');
+                            triggerConfetti();
+                        }
+                    }, 80);
+                };
+
+                const showTimerModal = ref(false);
+                const timerSecondsTotal = ref(300);
+                const isTimerRunning = ref(false);
+                let timerInterval = null;
+
+                const showRosterModal = ref(false);
+                const rosterInputText = ref('');
+                const toastMessage = ref('');
+
+                // 時鐘邏輯
+                const currentTime = ref(new Date());
+                let clockTimer = null;
+                const analogClockCanvas = ref(null);
+
+                const currentDateString = computed(() => {
+                    const d = currentTime.value;
+                    return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+                });
+
+                const currentDayOfWeek = computed(() => {
+                    const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+                    return days[currentTime.value.getDay()];
+                });
+
+                const currentTimeString = computed(() => {
+                    const d = currentTime.value;
+                    const hh = String(d.getHours()).padStart(2, '0');
+                    const mm = String(d.getMinutes()).padStart(2, '0');
+                    const ss = String(d.getSeconds()).padStart(2, '0');
+                    return `${hh}:${mm}:${ss}`;
+                });
+
+                const drawAnalogClock = () => {
+                    const canvas = analogClockCanvas.value;
+                    if (!canvas) return;
+                    const ctx = canvas.getContext('2d');
+                    const radius = canvas.width / 2;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    ctx.save();
+                    ctx.translate(radius, radius);
+
+                    const now = currentTime.value;
+                    const hour = now.getHours() % 12;
+                    const minute = now.getMinutes();
+                    const second = now.getSeconds();
+
+                    // 時針
+                    const hourAngle = (hour + minute / 60) * (Math.PI / 6);
+                    ctx.beginPath();
+                    ctx.rotate(hourAngle);
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(0, -radius * 0.5);
+                    ctx.strokeStyle = '#38bdf8';
+                    ctx.lineWidth = 2.5;
+                    ctx.lineCap = 'round';
+                    ctx.stroke();
+                    ctx.rotate(-hourAngle);
+
+                    // 分針
+                    const minuteAngle = (minute + second / 60) * (Math.PI / 30);
+                    ctx.beginPath();
+                    ctx.rotate(minuteAngle);
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(0, -radius * 0.7);
+                    ctx.strokeStyle = '#818cf8';
+                    ctx.lineWidth = 1.5;
+                    ctx.lineCap = 'round';
+                    ctx.stroke();
+                    ctx.rotate(-minuteAngle);
+
+                    // 秒針
+                    const secondAngle = second * (Math.PI / 30);
+                    ctx.beginPath();
+                    ctx.rotate(secondAngle);
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(0, -radius * 0.8);
+                    ctx.strokeStyle = '#f43f5e';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    ctx.rotate(-secondAngle);
+
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 2, 0, Math.PI * 2);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fill();
+
+                    ctx.restore();
+                };
+
+                const missingTotalCount = computed(() => {
+                    return students.value.reduce((acc, s) => acc + (s.missing ? s.missing.length : 0), 0);
+                });
+
+                const correctionTotalCount = computed(() => {
+                    return students.value.reduce((acc, s) => acc + (s.correction ? s.correction.length : 0), 0);
+                });
+
+                const signatureTotalCount = computed(() => {
+                    return students.value.reduce((acc, s) => acc + (s.signature ? s.signature.length : 0), 0);
+                });
+
+                const noPendingTasks = computed(() => {
+                    return missingTotalCount.value === 0 && correctionTotalCount.value === 0 && signatureTotalCount.value === 0;
+                });
+
+                // 動態計算大屏模式下的公告區放大比例與字體級距
+                const recessAnnouncementScale = computed(() => {
+                    const remaining = displayedStudents.value.length;
+                    if (remaining === 0) return 'full';
+                    if (remaining <= 3) return 'huge';    // 剩餘 1~3 人：巨型放大
+                    if (remaining <= 8) return 'large';   // 剩餘 4~8 人：大型放大
+                    if (remaining <= 14) return 'medium'; // 剩餘 9~14 人：中型放大
+                    return 'compact';                     // 剩餘 15 人以上：精簡橫幅
+                });
+
+                const recessAnnouncementClass = computed(() => {
+                    switch (recessAnnouncementScale.value) {
+                        case 'huge':
+                            return {
+                                container: 'p-4 md:p-6 bg-gradient-to-r from-indigo-950/95 via-slate-900/95 to-violet-950/95 border-2 border-amber-400 rounded-2xl shadow-2xl transition-all duration-500 ease-in-out shrink-0 mb-3 glow-amber',
+                                title: 'text-xl md:text-3xl text-amber-300 font-black',
+                                item: 'text-xl md:text-3xl font-black px-4 py-3 bg-slate-900/90 border-2 border-amber-400/80 rounded-xl shadow-lg',
+                                itemIndex: 'w-8 h-8 text-base md:text-lg font-black bg-amber-400 text-slate-950 rounded-lg flex items-center justify-center shrink-0'
+                            };
+                        case 'large':
+                            return {
+                                container: 'p-3 md:p-4 bg-gradient-to-r from-indigo-950/95 via-slate-900/95 to-violet-950/95 border-2 border-indigo-400 rounded-2xl shadow-xl transition-all duration-500 ease-in-out shrink-0 mb-2.5 glow-indigo',
+                                title: 'text-lg md:text-2xl text-amber-300 font-black',
+                                item: 'text-lg md:text-2xl font-black px-3.5 py-2.5 bg-slate-900/90 border border-indigo-400/60 rounded-xl shadow',
+                                itemIndex: 'w-7 h-7 text-xs md:text-sm font-black bg-amber-400 text-slate-950 rounded-lg flex items-center justify-center shrink-0'
+                            };
+                        case 'medium':
+                            return {
+                                container: 'p-2.5 md:p-3 bg-gradient-to-r from-indigo-950/95 via-slate-900/95 to-violet-950/95 border border-indigo-500/60 rounded-xl shadow-lg transition-all duration-500 ease-in-out shrink-0 mb-2',
+                                title: 'text-base md:text-lg text-amber-300 font-black',
+                                item: 'text-base md:text-lg font-bold px-3 py-2 bg-slate-900/90 border border-indigo-500/40 rounded-lg shadow',
+                                itemIndex: 'w-5 h-5 text-xs font-black bg-amber-400 text-slate-950 rounded flex items-center justify-center shrink-0'
+                            };
+                        default: // compact
+                            return {
+                                container: 'p-2 bg-gradient-to-r from-indigo-950/95 via-slate-900/95 to-violet-950/95 border border-indigo-500/40 rounded-xl shadow transition-all duration-500 ease-in-out shrink-0 mb-2',
+                                title: 'text-xs md:text-sm text-amber-300 font-black',
+                                item: 'text-xs md:text-sm font-bold px-2.5 py-1 bg-slate-900/90 border border-indigo-500/30 rounded-lg shadow',
+                                itemIndex: 'w-4 h-4 text-[10px] font-black bg-amber-400 text-slate-950 rounded flex items-center justify-center shrink-0'
+                            };
+                    }
+                });
+
+                const hasStudentPending = (student) => {
+                    return (student.missing && student.missing.length > 0) || 
+                           (student.correction && student.correction.length > 0) || 
+                           (student.signature && student.signature.length > 0);
+                };
+
+                const perfectStudentsCount = computed(() => {
+                    return students.value.filter(s => !hasStudentPending(s)).length;
+                });
+
+                const filterTabs = computed(() => [
+                    { id: 'all', label: '全班視圖', count: students.value.length, badgeClass: 'bg-slate-700 text-slate-200' },
+                    { id: 'missing', label: '有缺交者', count: students.value.filter(s => s.missing && s.missing.length > 0).length, badgeClass: 'bg-rose-600 text-white' },
+                    { id: 'correction', label: '待訂正者', count: students.value.filter(s => s.correction && s.correction.length > 0).length, badgeClass: 'bg-amber-500 text-slate-950 font-black' },
+                    { id: 'signature', label: '待補簽名者', count: students.value.filter(s => s.signature && s.signature.length > 0).length, badgeClass: 'bg-purple-600 text-white font-black' },
+                    { id: 'perfect', label: '作業全齊', count: perfectStudentsCount.value, badgeClass: 'bg-emerald-600 text-white' }
+                ]);
+
+                // 🌟 核心修改：大屏模式僅顯示有待處理項目（缺交/訂正/補簽）的學生，並維持座號順序！
+                const displayedStudents = computed(() => {
+                    if (isRecessMode.value) {
+                        // 只決定顯示哪些學生；卡片一律依座號由小到大排序。
+                        // 有待處理作業時，卡片內容仍優先顯示訂正／缺交／補簽；
+                        // 只有個別提醒的學生維持黃色卡片，但不被移到名單最後。
+                        return students.value
+                            .filter(s => hasStudentPending(s) || getStudentReminders(s).length > 0)
+                            .slice()
+                            .sort((a, b) => Number(a.id) - Number(b.id));
+                    }
+                    if (activeFilter.value === 'missing') {
+                        return students.value.filter(s => s.missing && s.missing.length > 0);
+                    }
+                    if (activeFilter.value === 'correction') {
+                        return students.value.filter(s => s.correction && s.correction.length > 0);
+                    }
+                    if (activeFilter.value === 'signature') {
+                        return students.value.filter(s => s.signature && s.signature.length > 0);
+                    }
+                    if (activeFilter.value === 'perfect') {
+                        return students.value.filter(s => !hasStudentPending(s));
+                    }
+                    return students.value;
+                });
+
+                const getStudentCardStyle = (student) => {
+                    if (batchMode.value.active && !isRecessMode.value) {
+                        return 'border-amber-400 bg-slate-900/90 glow-amber';
+                    }
+                    if (isRecessMode.value) {
+                        // 作業全齊、僅剩個別提醒：黃色醒目卡片；其他學生保留原樣。
+                        if (!hasStudentPending(student) && getStudentReminders(student).length > 0) {
+                            return 'border-yellow-300 bg-yellow-400 text-slate-950 shadow-[0_0_20px_rgba(250,204,21,0.5)]';
+                        }
+                        return 'border-amber-400/90 bg-amber-950/80 text-amber-100 glow-amber';
+                    }
+                    if (student.missing && student.missing.length > 0) {
+                        return 'border-rose-600/80 bg-rose-950/40 glow-rose';
+                    }
+                    if (student.correction && student.correction.length > 0) {
+                        return 'border-amber-500/80 bg-amber-950/40 glow-amber';
+                    }
+                    if (student.signature && student.signature.length > 0) {
+                        return 'border-purple-500/80 bg-purple-950/40 glow-purple';
+                    }
+                    return 'border-emerald-800/40 bg-slate-900/80 hover:border-emerald-500/60';
+                };
+
+                const handleStudentClick = (student) => {
+                    // 大屏模式只允許點擊科目標籤銷號，不因點擊姓名新增項目。
+                    if (isRecessMode.value) return;
+                    if (batchMode.value.active) {
+                        const type = batchMode.value.type;
+                        const subj = batchMode.value.subject;
+                        toggleSubject(student, type, subj);
+                        playSound('beep');
+                        showToast(`${student.id}號 ${student.name} 標記【${batchTypeName.value}】：${subj}`);
+                    } else {
+                        selectedStudent.value = student;
+                    }
+                };
+
+                const toggleSubject = (student, type, subject) => {
+                    if (!student[type]) student[type] = [];
+                    const list = student[type];
+                    const index = list.indexOf(subject);
+                    if (index > -1) {
+                        list.splice(index, 1);
+                    } else {
+                        list.push(subject);
+                    }
+                    saveAllData();
+                };
+
+                const studentSelfCheckoff = (student, type, index) => {
+                    const itemName = student[type][index];
+                    student[type].splice(index, 1);
+                    playSound('star');
+                    
+                    const actionName = type === 'missing' ? '補交' : (type === 'correction' ? '訂正' : '補簽');
+                    
+                    if (!hasStudentPending(student)) {
+                        triggerConfetti();
+                        showToast(`🎉 太棒了！${student.name} 已完成【${itemName}】，所有項目均已完成！⭐`);
+                    } else {
+                        showToast(`👍 ${student.name} 已完成【${itemName}】${actionName}！`);
+                    }
+                    saveAllData();
+                };
+
+                const exitBatchMode = () => {
+                    batchMode.value.active = false;
+                };
+
+                const clearStudentStatus = (student) => {
+                    student.missing = [];
+                    student.correction = [];
+                    student.signature = [];
+                    saveAllData();
+                    playSound('star');
+                    showToast(`${student.name} 已設為作業全齊！`);
+                    if (noPendingTasks.value) {
+                        triggerConfetti();
+                    }
+                };
+
+                const clearAllTasks = () => {
+                    students.value.forEach(s => {
+                        s.missing = [];
+                        s.correction = [];
+                        s.signature = [];
+                    });
+                    saveAllData();
+                    showToast('已清空全班今日缺交、訂正與補簽名紀錄');
+                };
+
+                const addHomeworkItem = () => {
+                    todayHomework.value.push({ text: '', priority: 'normal', crossed: false });
+                    saveAllData();
+                };
+
+                const removeHomeworkItem = (idx) => {
+                    todayHomework.value.splice(idx, 1);
+                    saveAllData();
+                };
+
+                // 隨機抽籤
+                const openRandomPicker = () => {
+                    showRandomPicker.value = true;
+                    pickedStudent.value = null;
+                };
+
+                const startRandomPick = () => {
+                    if (students.value.length === 0) return;
+                    isRolling.value = true;
+                    pickedStudent.value = null;
+                    let counter = 0;
+                    const maxCount = 20;
+
+                    const interval = setInterval(() => {
+                        const randomIndex = Math.floor(Math.random() * students.value.length);
+                        rollingName.value = `${students.value[randomIndex].id} 號 ${students.value[randomIndex].name}`;
+                        playSound('beep');
+                        counter++;
+
+                        if (counter >= maxCount) {
+                            clearInterval(interval);
+                            isRolling.value = false;
+                            pickedStudent.value = students.value[randomIndex];
+                            playSound('star');
+                            triggerConfetti();
+                        }
+                    }, 90);
+                };
+
+                // 計時器
+                const openTimer = () => {
+                    showTimerModal.value = true;
+                };
+
+                const formattedTimerMinutes = computed(() => {
+                    const m = Math.floor(timerSecondsTotal.value / 60);
+                    return String(m).padStart(2, '0');
+                });
+
+                const formattedTimerSeconds = computed(() => {
+                    const s = timerSecondsTotal.value % 60;
+                    return String(s).padStart(2, '0');
+                });
+
+                const setTimerMinutes = (mins) => {
+                    timerSecondsTotal.value = mins * 60;
+                    if (isTimerRunning.value) resetTimer();
+                };
+
+                const toggleTimer = () => {
+                    if (isTimerRunning.value) {
+                        clearInterval(timerInterval);
+                        isTimerRunning.value = false;
+                    } else {
+                        if (timerSecondsTotal.value <= 0) return;
+                        isTimerRunning.value = true;
+                        timerInterval = setInterval(() => {
+                            if (timerSecondsTotal.value > 0) {
+                                timerSecondsTotal.value--;
+                            } else {
+                                clearInterval(timerInterval);
+                                isTimerRunning.value = false;
+                                playSound('alarm');
+                                showToast('⏰ 時間到！請停止作答。');
+                                triggerConfetti();
+                            }
+                        }, 1000);
+                    }
+                };
+
+                const resetTimer = () => {
+                    clearInterval(timerInterval);
+                    isTimerRunning.value = false;
+                    timerSecondsTotal.value = 300;
+                };
+
+                // 名冊管理
+                const openRosterModal = () => {
+                    rosterInputText.value = students.value.map(s => s.name).join('\n');
+                    showRosterModal.value = true;
+                };
+
+                const saveRoster = () => {
+                    const names = rosterInputText.value.split('\n').map(n => n.trim()).filter(n => n.length > 0);
+                    if (names.length === 0) return;
+
+                    students.value = names.map((name, idx) => ({
+                        id: idx + 1,
+                        name: name,
+                        missing: [],
+                        correction: [],
+                        signature: []
+                    }));
+                    saveAllData();
+                    showRosterModal.value = false;
+                    showToast('班級名冊已成功更新！');
+                };
+
+                // 多教師隔離：每個 UID 僅存取 /users/{uid}/board/current。
+                // 不再使用跨帳號共用的 localStorage 鍵作為自動載入或儲存來源。
+                const saveAllData = async () => {
+                    if (!cloudLoaded || !cloudDocRef || !cloudUser.value || needsClassSetup.value) return;
+                    const target = cloudDocRef;
+                    const uid = cloudUser.value.uid;
+                    const payload = {
+                        className: className.value,
+                        students: JSON.parse(JSON.stringify(students.value)),
+                        todayHomework: JSON.parse(JSON.stringify(todayHomework.value)),
+                        reminders: JSON.parse(JSON.stringify(reminders.value)),
+                        updatedAt: Date.now()
+                    };
+                    try {
+                        await setDoc(target, payload);
+                        if (cloudUser.value?.uid === uid) isCloudConnected.value = true;
+                    } catch (e) {
+                        if (cloudUser.value?.uid === uid) {
+                            isCloudConnected.value = false;
+                            cloudError.value = '雲端儲存失敗，請確認網路與資料庫權限。';
+                        }
+                        console.warn('Cloud save failed:', e);
+                    }
+                };
+                const setupCloudListener = () => {
+                    if (!auth) return;
+                    onAuthStateChanged(auth, user => {
+                        if (unsubscribeCloud) { unsubscribeCloud(); unsubscribeCloud = null; }
+                        if (unsubscribeContact) { unsubscribeContact(); unsubscribeContact=null; }
+                        contactDocRef=null;contactBook.value={};contactSyncStatus.value='尚未登入';
+                        cloudLoaded = false;
+                        cloudDocRef = null;
+                        isCloudConnected.value = false;
+                        needsClassSetup.value = false;
+                        cloudInitializing.value = true;
+                        resetClassView();
+                        cloudUser.value = user;
+                        if (!user) { cloudInitializing.value = false; return; }
+                        const uid = user.uid;
+                        cloudDocRef = doc(db, 'users', uid, 'board', 'current');
+                        contactDocRef = doc(db, 'users', uid, 'board', 'contactbook');
+                        unsubscribeContact=onSnapshot(contactDocRef,snap=>{
+                            if(cloudUser.value?.uid!==uid)return;
+                            contactBook.value=snap.exists()&&snap.data()?.days&&typeof snap.data().days==='object'?snap.data().days:{};
+                            contactMorningBook.value=snap.exists()&&snap.data()?.morningDays&&typeof snap.data().morningDays==='object'?snap.data().morningDays:{};
+                            contactSyncStatus.value='聯絡簿雲端同步中';nextTick(fitContactText);
+                        },e=>{contactSyncStatus.value='聯絡簿同步失敗（請檢查資料庫規則）';console.warn(e)});
+                        unsubscribeCloud = onSnapshot(cloudDocRef, snapshot => {
+                            if (cloudUser.value?.uid !== uid) return;
+                            if (snapshot.exists()) {
+                                const data = snapshot.data();
+                                className.value = typeof data.className === 'string' ? data.className : '我的班級';
+                                students.value = Array.isArray(data.students) ? data.students : [];
+                                todayHomework.value = normalizeAnnouncements(data.todayHomework);
+                                reminders.value = Array.isArray(data.reminders) ? data.reminders : [];
+                                needsClassSetup.value = false;
+                            } else {
+                                // 全新教師需明確建立班級，絕不自動匯入其他老師的瀏覽器資料。
+                                resetClassView();
+                                needsClassSetup.value = true;
+                            }
+                            cloudLoaded = true;
+                            // 首次載入舊資料時，將原公告搬到統一提醒清單，保留內容與順序。
+                            // 使用固定來源 ID 防止雲端快照重複轉入；未刪除前舊公告仍保留備份。
+                            if (snapshot.exists() && todayHomework.value.some(h => h.text?.trim())) {
+                                const oldItems = todayHomework.value.filter(h => h.text?.trim());
+                                let changed = false;
+                                for (let i = 0; i < oldItems.length; i++) {
+                                    const item = oldItems[i];
+                                    const legacyId = 'legacy-announcement-' + i + '-' + String(item.text).length + '-' + String(item.text).slice(0,12);
+                                    if (!reminders.value.some(r => r.id === legacyId)) {
+                                        reminders.value.push({id:legacyId,date:getTodayStr(),time:'全天',studentIds:[],text:item.text,triggered:false});
+                                        changed = true;
+                                    }
+                                }
+                                if (changed || todayHomework.value.length) {
+                                    todayHomework.value = [];
+                                    saveAllData();
+                                }
+                            }
+                            cloudInitializing.value = false;
+                            isCloudConnected.value = true;
+                            cloudError.value = '';
+                        }, error => {
+                            if (cloudUser.value?.uid !== uid) return;
+                            cloudInitializing.value = false;
+                            isCloudConnected.value = false;
+                            cloudError.value = '同步失敗：請檢查 Firestore 安全規則及網路。';
+                            console.warn('Cloud listener failed:', error);
+                        });
+                    });
+                };
+
+                // 班級名稱僅在編輯完成後儲存，避免雲端快照回填時造成循環寫入。
+
+                const showToast = (msg) => {
+                    toastMessage.value = msg;
+                    setTimeout(() => {
+                        toastMessage.value = '';
+                    }, 2200);
+                };
+
+                const triggerConfetti = () => {
+                    if (typeof confetti === 'function') {
+                        confetti({
+                            particleCount: 75,
+                            spread: 65,
+                            origin: { y: 0.6 }
+                        });
+                    }
+                };
+
+                onMounted(() => {
+                    window.addEventListener('resize', syncRecessViewport);
+                    clockTimer = setInterval(() => {
+                        currentTime.value = new Date();
+                        drawAnalogClock();
+                        checkReminders();
+                    }, 1000);
+                    drawAnalogClock();
+                    setupCloudListener();
+                });
+
+                onUnmounted(() => {
+                    window.removeEventListener('resize', syncRecessViewport);
+                    if (clockTimer) clearInterval(clockTimer);
+                    if (timerInterval) clearInterval(timerInterval);
+                });
+
+                return {
+                    className,
+                    isEditingClassName,
+                    classNameInput,
+                    editClassName,
+                    isRecessMode,
+                    recessGridRows,
+                    defaultSubjects,
+                    students,
+                    todayHomework,
+                    activeHomeworkList,
+                    newReminderText,
+                    newReminderTime,
+                    newReminderDate,
+                    newReminderStudentIds,
+                    newReminderPriority,
+                    reminderPriorityLabel,
+                    reminderPriorityClass,
+                    reminderDateTimeLabel,
+                    getReminderStudentIds,
+                    getStudentReminders,
+                    getStudentTag,
+                    reminders,
+                    activeRemindersCount,
+                    todayReminders,
+                    activeTriggeredReminder,
+                    addReminder,
+                    removeReminder,
+                    editingReminderId,
+                    startReminderEdit,
+                    cancelReminderEdit,
+                    announcementClasses,
+                    announcementLabel,
+                    dismissTriggeredReminder,
+                    batchMode,
+                    batchTypeName,
+                    selectedStudent,
+                    activeFilter,
+                    filterTabs,
+                    displayedStudents,
+                    missingTotalCount,
+                    correctionTotalCount,
+                    signatureTotalCount,
+                    noPendingTasks,
+                    recessAnnouncementScale,
+                    recessAnnouncementClass,
+                    hasStudentPending,
+                    perfectStudentsCount,
+                    currentDateString,
+                    currentDayOfWeek,
+                    currentTimeString,
+                    analogClockCanvas,
+                    isCloudConnected,
+                    cloudConfigured, cloudUser, cloudError, cloudBusy,
+                    loginEmail, loginPassword, loginCloud, logoutCloud,
+                    cloudInitializing, needsClassSetup, setupClassName, setupRosterText,
+                    setupBusy, legacyBackupAvailable, cloudEmail, initializeClass,
+                    addHomeworkItem,
+                    removeHomeworkItem,
+                    selectBatchSubject,
+                    toggleCustomBatchMode,
+                    exitBatchMode,
+                    handleStudentClick,
+                    getStudentCardStyle,
+                    toggleSubject,
+                    studentSelfCheckoff,
+                    clearStudentStatus,
+                    clearAllTasks,
+                    saveAllData,
+                    showRandomPicker,
+                    isRolling,
+                    rollingName,
+                    pickedStudent,
+                    openRandomPicker,
+                    startRandomPick,
+                    showGroupShuffleModal,
+                    isGroupShuffling,
+                    shuffledGroups,
+                    openGroupShuffle,
+                    startGroupShuffle,
+                    showTimerModal,
+                    formattedTimerMinutes,
+                    formattedTimerSeconds,
+                    isTimerRunning,
+                    openTimer,
+                    setTimerMinutes,
+                    toggleTimer,
+                    resetTimer,
+                    showRosterModal,
+                    rosterInputText,
+                    openRosterModal,
+                    saveRoster,
+                    contactBoardOpen,contactEditorOpen,contactPreviewDate,contactEditDate,contactBook,contactDraft,contactMorningBook,contactMorningDraft,contactShownMorning,contactCombinedNotices,contactSaving,contactEditorError,contactSyncStatus,contactFontSize,contactWriting,
+                    contactToday,contactDateLabel,contactDateParts,contactCircle,contactShownTasks,contactTokens,openContactBoard,openContactEditor,loadContactDraft,copyContactPrevious,saveContactDraft,
+                    toastMessage
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
