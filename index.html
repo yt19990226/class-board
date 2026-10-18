@@ -173,12 +173,15 @@
 .recess-pending-announcements>div:first-child{flex:none;margin-bottom:3px!important;padding-bottom:3px!important}
 .recess-pending-notice-list{flex:1;min-height:0;max-height:none!important;align-content:flex-start;gap:6px!important}
 .recess-pending-notice-list>div{padding:5px 9px!important;font-size:clamp(13px,1.25vw,19px)!important;line-height:1.25}
-.recess-student-grid{align-content:start!important;grid-auto-rows:clamp(145px,23vh,210px)!important;overflow-y:auto!important;padding-bottom:2px!important}
+.recess-student-grid{align-content:start!important;grid-auto-rows:minmax(0, min(210px, calc((100% - (var(--recess-rows) - 1) * 12px) / var(--recess-rows))))!important;overflow-y:hidden!important;padding-bottom:0!important}
 .recess-student-card{min-height:0!important;overflow:hidden;gap:2px}
 .recess-student-card h3{font-size:clamp(17px,2.05vw,30px)!important;line-height:1.08}
 @media(max-width:850px){.recess-pending-announcements{max-height:15vh}.recess-student-card h3{font-size:clamp(15px,2.5vw,24px)!important}}
 @media(max-height:780px){.recess-pending-announcements{max-height:14vh;padding:6px 10px!important}.recess-student-card{padding:5px!important}.recess-student-card h3{font-size:clamp(14px,1.8vw,25px)!important}}
 
+/* 無當日公告時直接省略整個公告區；學生名單使用剩餘畫面高度。 */
+@media(max-height:850px){.recess-student-grid{row-gap:8px!important}}
+@media(max-height:680px){.recess-student-card h3{font-size:clamp(13px,1.6vw,24px)!important}}
 </style>
 </head>
 <body class="h-screen w-screen overflow-hidden text-slate-100 bg-slate-950">
@@ -519,7 +522,7 @@
                 <!-- 下課大屏模式專屬公告區 -->
                 <template v-if="isRecessMode">
                     <!-- 情況 A：全班皆無待處理項目（所有學生銷號完畢） -->
-                    <div v-if="noPendingTasks" class="flex-1 flex flex-col h-full overflow-hidden p-2">
+                    <div v-if="noPendingTasks && todayReminders.length > 0" class="flex-1 flex flex-col h-full overflow-hidden p-2">
                         <div class="flex-1 glass-panel rounded-2xl p-5 border-2 border-emerald-500/50 flex flex-col overflow-y-auto glow-emerald gap-4">
                             
                             <!-- 頁首標題 -->
@@ -558,7 +561,7 @@
                     </div>
 
                     <!-- 情況 B：有同學需要處理作業 (隨人數被點掉，公告區與字型動態自動放大) -->
-                    <div v-else :class="recessAnnouncementClass.container" class="recess-pending-announcements">
+                    <div v-else-if="todayReminders.length > 0" :class="recessAnnouncementClass.container" class="recess-pending-announcements">
                         <div class="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-indigo-500/30">
                             <div class="flex items-center gap-2" :class="recessAnnouncementClass.title">
                                 <i class="fa-solid fa-bullhorn text-amber-400 animate-bounce"></i>
@@ -638,7 +641,7 @@
 
                     <!-- 學生卡片網格 -->
                     <div class="flex-1 overflow-hidden h-full min-h-0">
-                        <div :style="isRecessMode ? {'--recess-student-count': displayedStudents.length} : {}" :class="[
+                        <div :style="isRecessMode ? {'--recess-student-count': displayedStudents.length, '--recess-rows': recessGridRows} : {}" :class="[
                             'w-full h-full gap-2 md:gap-3 overflow-y-auto pr-1 pb-2',
                             isRecessMode 
                                 ? 'recess-student-grid grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6' 
@@ -1199,6 +1202,14 @@
 
                 // 下課大屏模式
                 const isRecessMode = ref(false);
+                // 按實際畫面欄數計算列數：卡片不會因人數少而放大，人數多時縮短高度以免捲動。
+                const recessViewportWidth = ref(window.innerWidth);
+                const syncRecessViewport = () => { recessViewportWidth.value = window.innerWidth; };
+                const recessGridRows = computed(() => {
+                    const w = recessViewportWidth.value;
+                    const cols = w >= 1024 ? 6 : w >= 768 ? 5 : w >= 640 ? 4 : 3;
+                    return Math.max(1, Math.ceil(displayedStudents.value.length / cols));
+                });
 
                 // 常用預設科目
                 const defaultSubjects = ref([
@@ -2024,6 +2035,7 @@
                 };
 
                 onMounted(() => {
+                    window.addEventListener('resize', syncRecessViewport);
                     clockTimer = setInterval(() => {
                         currentTime.value = new Date();
                         drawAnalogClock();
@@ -2034,6 +2046,7 @@
                 });
 
                 onUnmounted(() => {
+                    window.removeEventListener('resize', syncRecessViewport);
                     if (clockTimer) clearInterval(clockTimer);
                     if (timerInterval) clearInterval(timerInterval);
                 });
@@ -2044,6 +2057,7 @@
                     classNameInput,
                     editClassName,
                     isRecessMode,
+                    recessGridRows,
                     defaultSubjects,
                     students,
                     todayHomework,
