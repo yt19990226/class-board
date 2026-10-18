@@ -153,6 +153,21 @@
 @media(max-width:900px){.cb-fill-entry .cb-fill-text{font-size:clamp(14px,3cqh,36px)}.cb-reminder-spotlight-text{font-size:clamp(18px,2.3vw,32px)}}
 
     
+
+/* 聯絡簿左側文字放大：不改版型、色彩與欄位，依每格可用面積和文字長度縮放 */
+.cb-left-new .cb-fill-entry{container-type:size;overflow:hidden}
+.cb-left-new .cb-fill-entry .cb-fill-text{font-size:clamp(19px,min(10cqw,16cqh),74px);line-height:1.27;max-width:100%;max-height:100%;overflow-wrap:anywhere}
+.cb-left-new .cb-fill-list.cb-n-1 .cb-fill-entry .cb-fill-text{font-size:clamp(23px,min(12cqw,21cqh),88px)}
+.cb-left-new .cb-fill-list.cb-n-2 .cb-fill-entry .cb-fill-text{font-size:clamp(21px,min(10.5cqw,18cqh),76px)}
+.cb-left-new .cb-fill-list.cb-n-3 .cb-fill-entry .cb-fill-text{font-size:clamp(19px,min(9cqw,15cqh),64px)}
+.cb-left-new .cb-fill-list.cb-n-4 .cb-fill-entry .cb-fill-text{font-size:clamp(17px,min(8cqw,12cqh),52px)}
+.cb-left-new .cb-fill-list.cb-n-5 .cb-fill-entry .cb-fill-text{font-size:clamp(16px,min(7cqw,10cqh),44px)}
+.cb-left-new .cb-fill-entry.cb-long .cb-fill-text{font-size:clamp(17px,min(7cqw,11cqh),46px)!important}
+.cb-left-new .cb-fill-entry.cb-very-long .cb-fill-text{font-size:clamp(15px,min(5.6cqw,8cqh),34px)!important}
+.cb-left-new .cb-fill-entry .cb-reminder-tags{flex:none;max-width:100%}
+.cb-left-new .cb-fill-entry .cb-reminder-tag{font-size:clamp(12px,min(3.3cqw,5cqh),21px)}
+.cb-left-new .cb-morning-entry .cb-fill-text{color:#0c3767}
+
 /* 聯絡簿新版：左側上下分區，右側直式內容及原編輯器不變 */
 .cb-left-new{width:26%;min-width:250px;gap:12px}
 .cb-left-new .cb-morning-panel{flex:1 1 40%}
