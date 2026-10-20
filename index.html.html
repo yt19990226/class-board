@@ -168,6 +168,21 @@
 .cb-left-new .cb-fill-entry .cb-reminder-tag{font-size:clamp(12px,min(3.3cqw,5cqh),21px)}
 .cb-left-new .cb-morning-entry .cb-fill-text{color:#0c3767}
 
+/* 2026-10-20：只放大聯絡簿左下公告文字；維持外框、早修任務及原配色 */
+.cb-left-new .cb-news-panel .cb-fill-entry .cb-fill-text{font-size:clamp(22px,min(13cqw,34cqh),84px);line-height:1.18;font-weight:900}
+.cb-left-new .cb-news-panel .cb-fill-list.cb-n-1 .cb-fill-text{font-size:clamp(25px,min(16cqw,46cqh),96px)}
+.cb-left-new .cb-news-panel .cb-fill-list.cb-n-2 .cb-fill-text{font-size:clamp(23px,min(14cqw,40cqh),86px)}
+.cb-left-new .cb-news-panel .cb-fill-list.cb-n-3 .cb-fill-text{font-size:clamp(21px,min(13cqw,35cqh),76px)}
+.cb-left-new .cb-news-panel .cb-fill-list.cb-n-4 .cb-fill-text{font-size:clamp(19px,min(11cqw,29cqh),66px)}
+.cb-left-new .cb-news-panel .cb-fill-list.cb-n-5 .cb-fill-text{font-size:clamp(18px,min(9.5cqw,24cqh),55px)}
+.cb-left-new .cb-news-panel .cb-fill-entry.cb-long .cb-fill-text{font-size:clamp(17px,min(9cqw,24cqh),54px)!important}
+.cb-left-new .cb-news-panel .cb-fill-entry.cb-very-long .cb-fill-text{font-size:clamp(15px,min(7cqw,19cqh),42px)!important}
+.cb-left-new .cb-news-panel .cb-fill-entry .cb-reminder-tags{margin-bottom:clamp(4px,1.2cqh,10px)}
+/* 時鐘僅微幅放大，避免擠壓班級標題與按鈕 */
+.board-header-clock .board-digital-clock{font-size:clamp(25px,2.35vw,39px);line-height:1.08;font-variant-numeric:tabular-nums;white-space:nowrap}
+.board-header-clock .board-analog-clock{width:clamp(44px,3.5vw,58px);height:clamp(44px,3.5vw,58px)}
+@media(max-width:1100px){.board-header-clock .board-digital-clock{font-size:clamp(22px,2.6vw,30px)}.board-header-clock .board-analog-clock{width:44px;height:44px}}
+
 /* 聯絡簿新版：左側上下分區，右側直式內容及原編輯器不變 */
 .cb-left-new{width:26%;min-width:250px;gap:12px}
 .cb-left-new .cb-morning-panel{flex:1 1 40%}
@@ -197,9 +212,143 @@
 /* 無當日公告時直接省略整個公告區；學生名單使用剩餘畫面高度。 */
 @media(max-height:850px){.recess-student-grid{row-gap:8px!important}}
 @media(max-height:680px){.recess-student-card h3{font-size:clamp(13px,1.6vw,24px)!important}}
+
+/* 2026-10-20：學生卡片粉彩明亮版，僅改學生卡片，不動公告、時鐘及聯絡簿 */
+.pastel-card{background:#e4eee5!important;color:#183349!important;box-shadow:0 2px 9px #101c3030!important}
+.pastel-card:nth-child(7n+1){background:#f5d4cb!important}
+.pastel-card:nth-child(7n+2){background:#f7e5b7!important}
+.pastel-card:nth-child(7n+3){background:#e3ecc2!important}
+.pastel-card:nth-child(7n+4){background:#c9e5d5!important}
+.pastel-card:nth-child(7n+5){background:#d1e4f0!important}
+.pastel-card:nth-child(7n+6){background:#e4d9ed!important}
+.pastel-card:nth-child(7n+7){background:#f2d8e1!important}
+.pastel-card h3{color:#173249!important;text-shadow:none!important}
+.pastel-card .normal-inline-name{color:#173249!important}
+.normal-inline-name{font-size:clamp(16px,1.35vw,25px);line-height:1.2;color:#f8fafc}
+.recess-student-card h3{font-size:clamp(24px,2.65vw,43px)!important;line-height:1.1!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-height:780px){.recess-student-card h3{font-size:clamp(20px,2.3vw,36px)!important}}
+@media(max-height:680px){.recess-student-card h3{font-size:clamp(17px,2vw,30px)!important}}
+@media(max-width:1100px){.normal-inline-name{font-size:clamp(13px,1.35vw,19px)}}
+
+/* 2026-10-20 全站馬卡龍主題：背景、面板、工具視窗一起改為柔和亮色。
+   聯絡簿維持既有綠色黑板，編輯視窗維持白底。 */
+body.pastel-whole-screen{background:linear-gradient(135deg,#fce9e4 0%,#f8edce 23%,#e6f0d9 48%,#dceef0 73%,#efe4f4 100%)!important;color:#28394a!important}
+body.pastel-whole-screen #app{background:transparent!important}
+body.pastel-whole-screen .glass-panel{background:rgba(255,255,255,.76)!important;border-color:#c7d4dc!important;backdrop-filter:blur(12px);box-shadow:0 3px 16px #59687919!important;color:#28394a!important}
+body.pastel-whole-screen header.glass-panel{background:linear-gradient(105deg,#f6d9e5,#e1e9fa,#d5eee1)!important;border-color:#c6c2dd!important}
+body.pastel-whole-screen aside .glass-panel:nth-of-type(3n+1){background:#f9e7dc!important}
+body.pastel-whole-screen aside .glass-panel:nth-of-type(3n+2){background:#e8efd9!important}
+body.pastel-whole-screen aside .glass-panel:nth-of-type(3n){background:#e5edf9!important}
+body.pastel-whole-screen .glass-panel :is(h1,h2,h3,h4){color:#34465b}
+body.pastel-whole-screen :is(.text-slate-100,.text-slate-200,.text-slate-300,.text-slate-400,.text-indigo-200){color:#34465b}
+body.pastel-whole-screen :is(.text-amber-100,.text-amber-200,.text-amber-300){color:#8d5718}
+body.pastel-whole-screen :is(.text-indigo-300,.text-indigo-400){color:#514ca0}
+body.pastel-whole-screen :is(.bg-slate-900\/90,.bg-slate-900\/80,.bg-slate-900\/70,.bg-slate-900,.bg-slate-800,.bg-slate-800\/80,.bg-slate-800\/70,.bg-slate-950){background-color:#f7f9fc!important;color:#28394a}
+body.pastel-whole-screen :is(.border-slate-700,.border-slate-800,.border-slate-600){border-color:#cbd5e1!important}
+body.pastel-whole-screen input:not([type=checkbox]):not([type=radio]),body.pastel-whole-screen select,body.pastel-whole-screen textarea{color:#28394a}
+body.pastel-whole-screen input::placeholder{color:#8291a2}
+body.pastel-whole-screen .board-header-clock{background:#fdf5e8!important;color:#28394a!important;border-color:#ddc9ae!important}
+body.pastel-whole-screen .board-header-clock .board-analog-clock{background:#e7eff8!important}
+body.pastel-whole-screen .board-header-clock .board-digital-clock{color:#126f68!important}
+body.pastel-whole-screen .recess-student-card:not(.pastel-card){background:#f8e4d6!important;color:#28394a!important}
+body.pastel-whole-screen .recess-student-card:not(.pastel-card) h3{color:#253a50!important}
+body.pastel-whole-screen .pastel-card{border-color:#aabccc!important}
+/* 深色背景的互動按鈕與狀態標籤仍保留白字對比 */
+body.pastel-whole-screen :is(.bg-indigo-600,.bg-indigo-500,.bg-purple-600,.bg-purple-500,.bg-rose-600,.bg-sky-600,.bg-emerald-600,.bg-teal-600,.bg-pink-600).text-white{color:white!important}
+/* 聯絡簿與編輯器完全不受全站亮色主題的文字/底色覆寫 */
+body.pastel-whole-screen .cb-board,body.pastel-whole-screen .cb-board :is(.cb-panel,.cb-fill-entry,.cb-btn){color:inherit}
+body.pastel-whole-screen .cb-board .cb-morning-entry{color:#0c3767}
+body.pastel-whole-screen .cb-editor .cb-dialog{background:#f8fafc;color:#17212b}
+
+
+/* 2026-10-20 馬卡龍對比修正版：保留布局，只處理深淺背景與選取可讀性 */
+body.pastel-whole-screen{--ui-ink:#24374c;--ui-muted:#4b6178;--ui-line:#b7c8d7;--ui-focus:#3f56c9}
+/* 深色主題殘留的低對比文字、互動狀態 */
+body.pastel-whole-screen :is(.text-slate-500,.text-slate-400,.text-slate-300,.text-slate-200,.text-indigo-200,.text-indigo-300,.text-indigo-400){color:var(--ui-muted)!important}
+body.pastel-whole-screen :is(.text-emerald-200,.text-emerald-300,.text-emerald-400){color:#116c53!important}
+body.pastel-whole-screen :is(.text-sky-200,.text-sky-300,.text-sky-400){color:#155f90!important}
+body.pastel-whole-screen :is(.text-purple-200,.text-purple-300,.text-purple-400){color:#67459c!important}
+body.pastel-whole-screen :is(.text-rose-200,.text-rose-300,.text-rose-400){color:#a02e53!important}
+body.pastel-whole-screen :is(.text-amber-200,.text-amber-300,.text-amber-400){color:#85500d!important}
+body.pastel-whole-screen :is(.text-white,.text-slate-50,.text-slate-100){color:var(--ui-ink)}
+/* 原有深色底在明亮主題下換成柔和實色，避免半透明色造成文字看不見 */
+body.pastel-whole-screen :is(.bg-slate-950,.bg-slate-900,.bg-slate-900\/90,.bg-slate-900\/80,.bg-slate-800,.bg-slate-800\/80,.bg-slate-800\/70){background-color:#f3f7fd!important;color:var(--ui-ink)!important}
+body.pastel-whole-screen :is(.bg-amber-950\/80,.bg-amber-950\/60,.bg-amber-950\/40){background-color:#fff0cc!important;color:#71420b!important}
+body.pastel-whole-screen :is(.bg-indigo-950\/80,.bg-purple-950\/80){background-color:#e9e4f9!important;color:#483778!important}
+body.pastel-whole-screen :is(.bg-emerald-950\/40,.bg-emerald-900\/80){background-color:#dbf2e5!important;color:#155c46!important}
+/* 操作按鈕一律採深字/深色按鈕白字，不再被全域文字覆寫 */
+body.pastel-whole-screen button{transition:filter .15s ease,box-shadow .15s ease,background-color .15s ease}
+body.pastel-whole-screen button:hover:not(:disabled){filter:brightness(.94)}
+body.pastel-whole-screen button:focus-visible,body.pastel-whole-screen :is(input,select,textarea):focus-visible,body.pastel-whole-screen label:focus-within{outline:3px solid var(--ui-focus)!important;outline-offset:2px}
+body.pastel-whole-screen button:disabled{opacity:.48;cursor:not-allowed}
+body.pastel-whole-screen :is(button,span,label).bg-indigo-600,body.pastel-whole-screen :is(button,span,label).bg-indigo-500,body.pastel-whole-screen :is(button,span,label).bg-purple-600,body.pastel-whole-screen :is(button,span,label).bg-purple-500,body.pastel-whole-screen :is(button,span,label).bg-sky-600,body.pastel-whole-screen :is(button,span,label).bg-emerald-600,body.pastel-whole-screen :is(button,span,label).bg-rose-600,body.pastel-whole-screen :is(button,span,label).bg-pink-600{color:#fff!important}
+body.pastel-whole-screen :is(button,span,label).bg-amber-500,body.pastel-whole-screen :is(button,span,label).bg-amber-400{color:#382600!important}
+body.pastel-whole-screen :is(button,span,label).bg-amber-500 *,body.pastel-whole-screen :is(button,span,label).bg-amber-400 *{color:inherit!important}
+body.pastel-whole-screen :is(button,span,label).bg-indigo-600 *,body.pastel-whole-screen :is(button,span,label).bg-purple-600 *,body.pastel-whole-screen :is(button,span,label).bg-sky-600 *,body.pastel-whole-screen :is(button,span,label).bg-emerald-600 *{color:inherit!important}
+body.pastel-whole-screen :is(input:not([type=checkbox]):not([type=radio]),select,textarea){background:#fff!important;color:#20354c!important;border-color:#a7b8c9!important}
+body.pastel-whole-screen :is(input,textarea)::placeholder{color:#61758b!important;opacity:1}
+/* 教師後台可選的分類、狀態與快速標記：選取時有實底與外框 */
+body.pastel-whole-screen label:has(input[type=radio]:checked),body.pastel-whole-screen label:has(input[type=checkbox]:checked){box-shadow:inset 0 0 0 2px #6273c5,0 2px 7px #384a6524;border-radius:9px}
+body.pastel-whole-screen input[type=checkbox],body.pastel-whole-screen input[type=radio]{accent-color:#4e5cc5}
+/* 下課大屏公告：待處理與全班完成兩種情境，改為奶油黃＋淡粉色 */
+body.pastel-whole-screen .recess-pending-announcements{background:linear-gradient(115deg,#fff0d5,#f9e6e9,#eee8fa)!important;border:2px solid #d3a7b4!important;color:#583a4e!important;box-shadow:0 3px 14px #83657724!important}
+body.pastel-whole-screen .recess-pending-announcements>div:first-child{border-color:#d6b3b7!important}
+body.pastel-whole-screen .recess-pending-announcements .recess-pending-notice-list>div{background:#fff9eb!important;color:#533b28!important;border:1px solid #d9b985!important;box-shadow:0 2px 5px #a88a6a16!important}
+body.pastel-whole-screen .recess-pending-announcements .recess-pending-notice-list>div>span.font-mono{color:#744d18!important}
+body.pastel-whole-screen .recess-pending-announcements .fa-bullhorn{color:#9b5a30!important}
+body.pastel-whole-screen .recess-pending-announcements .bg-amber-500\/20{background:#fff2cb!important;color:#76470c!important;border-color:#d4ae62!important}
+/* 全班完成後的滿版公告，不再是深黑色突兀色塊 */
+body.pastel-whole-screen .cb-reminder-spotlight{background:linear-gradient(130deg,#fff3d9,#fce9e9,#eceafa)!important;border:2px solid #d7b1ad!important;color:#533d43!important}
+body.pastel-whole-screen .cb-reminder-spotlight h3{color:#7a4b23!important;border-color:#d7b1ad!important}
+body.pastel-whole-screen .cb-reminder-spotlight-entry{background:#fffdf5!important;border:1px solid #d7c3a3!important;color:#3f3b3a!important}
+body.pastel-whole-screen .cb-reminder-spotlight-text{color:#344259!important}
+body.pastel-whole-screen .cb-reminder-spotlight-time.bg-amber-500\/20{background:#fff0c8!important;color:#774c13!important;border-color:#d4b56d!important}
+body.pastel-whole-screen .cb-reminder-spotlight-tag{background:#ffe3a2!important;color:#51340d!important}
+/* 緊急程度徽章使用一致的實色對比，避免白字/淡色底互相抵銷 */
+body.pastel-whole-screen .recess-pending-notice-list :is(.bg-red-900\/80,.bg-rose-900\/80),body.pastel-whole-screen .cb-reminder-spotlight :is(.bg-red-900\/80,.bg-rose-900\/80){background:#ffe0e3!important;color:#91263e!important}
+/* 聯絡簿綠色黑板及其內部按鈕保持原來對比，不受全站色彩規則影響 */
+body.pastel-whole-screen .cb-board .cb-fill-text{color:inherit}
+body.pastel-whole-screen .cb-board .cb-morning-entry .cb-fill-text{color:#0c3767!important}
+
+
+/* 2026-10-20 可讀性精修：針對實際畫面標示的深色按鈕、徽章及學生選取列 */
+/* 聯絡簿黑板的三個導覽鍵：強制白字，包含內部圖示 */
+body.pastel-whole-screen .cb-board .cb-top button.cb-btn,
+body.pastel-whole-screen .cb-board .cb-top button.cb-btn *{color:#ffffff!important}
+body.pastel-whole-screen .cb-board .cb-top button.cb-btn{background:#21634f!important;border:1px solid #a1d8c1!important}
+body.pastel-whole-screen .cb-board .cb-top button.cb-btn:hover{background:#287d61!important}
+/* 主畫面綠色「今日聯絡簿」按鈕：白字 */
+body.pastel-whole-screen header button.bg-emerald-800,
+body.pastel-whole-screen header button.bg-emerald-800 *{color:#ffffff!important}
+body.pastel-whole-screen header button.bg-emerald-800{background-color:#166b54!important}
+/* 深色的狀態膠囊及登出鍵：深底白字，數字繼承白字 */
+body.pastel-whole-screen header button.bg-slate-700,
+body.pastel-whole-screen header button.bg-slate-700 *{color:#ffffff!important}
+body.pastel-whole-screen header button.bg-slate-700{background-color:#354760!important}
+body.pastel-whole-screen header span.bg-rose-950\/80{background:#80283d!important;color:#fff!important}
+body.pastel-whole-screen header span.bg-rose-950\/80 *{color:#fff!important}
+body.pastel-whole-screen header span.bg-emerald-950\/80{background:#1d6955!important;color:#fff!important}
+body.pastel-whole-screen header span.bg-emerald-950\/80 *{color:#fff!important}
+/* 學生卡片「全齊」：原本深綠底被全站文字改成深綠字，修回白字 */
+body.pastel-whole-screen .bg-emerald-950\/80.text-emerald-300{background:#166b52!important;color:#ffffff!important}
+body.pastel-whole-screen .bg-emerald-950\/80.text-emerald-300 *{color:#ffffff!important}
+/* 教師提醒：選取學生時使用淺紫底＋深色文字，不再出現深底深字 */
+body.pastel-whole-screen label:has(input[type=checkbox]:checked).bg-amber-400\/25{background:#e3e1ff!important;color:#253b63!important;border:1px solid #6e68c7!important}
+body.pastel-whole-screen label:has(input[type=checkbox]:checked).bg-amber-400\/25 span{color:#253b63!important}
+body.pastel-whole-screen label:has(input[type=checkbox]:checked).bg-amber-400\/25 input{accent-color:#514ac4!important}
+/* 全站深底色按鈕的文字與圖示：防止全域 .text-white 覆蓋成深色 */
+body.pastel-whole-screen button.bg-emerald-800,
+body.pastel-whole-screen button.bg-emerald-700,
+body.pastel-whole-screen button.bg-teal-700,
+body.pastel-whole-screen button.bg-slate-700,
+body.pastel-whole-screen button.bg-emerald-800 *,
+body.pastel-whole-screen button.bg-emerald-700 *,
+body.pastel-whole-screen button.bg-teal-700 *,
+body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
+
 </style>
 </head>
-<body class="h-screen w-screen overflow-hidden text-slate-100 bg-slate-950">
+<body class="pastel-whole-screen h-screen w-screen overflow-hidden">
     <div id="app" class="h-full w-full flex flex-col p-2.5 md:p-3 gap-2.5 md:gap-3">
         
 
@@ -346,8 +495,8 @@
             </div>
 
             <!-- 時間與視覺化動態類比/數位時鐘 -->
-            <div class="flex items-center gap-3 bg-slate-900/90 text-white px-3.5 py-1.5 rounded-xl border border-slate-700/60 w-full sm:w-auto justify-between sm:justify-end">
-                <div class="relative w-10 h-10 md:w-11 md:h-11 bg-slate-800 rounded-full border border-slate-600 flex items-center justify-center shrink-0 shadow-inner">
+            <div class="board-header-clock flex items-center gap-3 bg-slate-900/90 text-white px-3.5 py-1.5 rounded-xl border border-slate-700/60 w-full sm:w-auto justify-between sm:justify-end">
+                <div class="board-analog-clock relative bg-slate-800 rounded-full border border-slate-600 flex items-center justify-center shrink-0 shadow-inner">
                     <canvas ref="analogClockCanvas" width="44" height="44" class="w-full h-full"></canvas>
                 </div>
                 <div class="text-right">
@@ -355,7 +504,7 @@
                         <span>{{ currentDateString }}</span>
                         <span class="bg-indigo-900/80 text-indigo-200 px-1.5 py-0.2 rounded text-[10px]">{{ currentDayOfWeek }}</span>
                     </div>
-                    <div class="text-xl md:text-2xl font-black tracking-tight font-mono text-emerald-400">
+                    <div class="board-digital-clock font-black tracking-tight font-mono text-emerald-400">
                         {{ currentTimeString }}
                     </div>
                 </div>
@@ -524,12 +673,6 @@
                     </div>
                 </div>
 
-                <!-- 快捷清空工具 -->
-                <div class="mt-auto">
-                    <button @click="clearAllTasks" class="w-full py-2 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border border-rose-800/50">
-                        <i class="fa-solid fa-trash-arrow-up"></i> 重置全班今日紀錄
-                    </button>
-                </div>
             </aside>
 
             <section class="flex-1 glass-panel rounded-2xl p-2.5 md:p-3 shadow-lg flex flex-col overflow-hidden relative border border-slate-700/60">
@@ -672,14 +815,16 @@
                                      getStudentCardStyle(student)
                                  ]">
                                 
-                                <!-- 卡片頂部：座號與一鍵清除 -->
-                                <div class="flex items-center justify-between w-full">
+                                <!-- 卡片頂部：一般模式座號與姓名同行，大屏模式姓名置中 -->
+                                <div class="flex items-center justify-between w-full" :class="!isRecessMode ? 'gap-1.5' : ''">
                                     <span :class="[
                                         'rounded-xl font-black flex items-center justify-center shadow-md shrink-0',
-                                        isRecessMode ? 'w-6 h-6 text-xs bg-amber-400 text-slate-950 font-black' : 'w-6 h-6 md:w-7 md:h-7 text-xs md:text-sm bg-indigo-600 text-white'
+                                        isRecessMode ? 'w-9 h-9 text-lg bg-amber-400 text-slate-950 font-black' : 'w-7 h-7 md:w-8 md:h-8 text-sm md:text-base bg-indigo-600 text-white'
                                     ]">
                                         {{ student.id }}
                                     </span>
+
+                                    <span v-if="!isRecessMode" class="normal-inline-name flex-1 min-w-0 text-center font-black truncate">{{ student.name }}</span>
 
                                     <button v-if="hasStudentPending(student)" 
                                             @click.stop="clearStudentStatus(student)"
@@ -690,7 +835,7 @@
                                 </div>
 
                                 <!-- 學生姓名：清晰置中與字型適應 -->
-                                <div class="text-center my-1 w-full">
+                                <div v-if="isRecessMode" class="text-center my-1 w-full">
                                     <h3 :class="[
                                         'font-black tracking-wide leading-tight truncate',
                                         isRecessMode ? (!hasStudentPending(student) && getStudentReminders(student).length ? 'text-xl sm:text-2xl md:text-[30px] lg:text-[32px] text-slate-950' : 'text-xl sm:text-2xl md:text-[30px] lg:text-[32px] text-amber-100') : 'text-base md:text-lg text-slate-100'
@@ -921,9 +1066,9 @@
 
         <!-- 隨機抽籤 Modal -->
         <div v-if="showRandomPicker" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-            <div class="glass-panel w-full max-w-sm rounded-3xl p-5 shadow-2xl text-center flex flex-col gap-4 border border-sky-500/30">
+            <div class="glass-panel w-full max-w-5xl max-h-[94vh] overflow-y-auto rounded-3xl p-6 md:p-10 shadow-2xl text-center flex flex-col gap-5 border border-sky-500/30">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                    <h2 class="text-base font-black text-sky-300 flex items-center gap-2">
+                    <h2 class="text-xl md:text-3xl font-black text-sky-300 flex items-center gap-2">
                         <i class="fa-solid fa-dice text-sky-400"></i> 全班個人幸運抽籤
                     </h2>
                     <button @click="showRandomPicker = false" class="text-slate-400 hover:text-white">
@@ -931,20 +1076,25 @@
                     </button>
                 </div>
 
-                <div class="py-6 bg-slate-900 rounded-2xl border border-slate-800 text-white flex flex-col items-center justify-center min-h-[140px]">
+                <div class="py-6 bg-slate-900 rounded-2xl border border-slate-800 text-white flex flex-col items-center justify-center min-h-[220px] md:min-h-[300px]">
                     <div v-if="pickedStudent" class="animate-bounce">
-                        <span class="text-sky-400 font-bold text-sm block">抽中了！ {{ pickedStudent.id }} 號</span>
-                        <span class="text-3xl font-black text-amber-300 mt-1 block">{{ pickedStudent.name }}</span>
+                        <span class="text-sky-400 font-bold text-xl md:text-3xl block">抽中了！ {{ pickedStudent.id }} 號</span>
+                        <span class="text-5xl md:text-7xl font-black text-amber-300 mt-3 block">{{ pickedStudent.name }}</span>
                     </div>
-                    <div v-else-if="isRolling" class="text-2xl font-black text-sky-300 tracking-wider">
+                    <div v-else-if="isRolling" class="text-4xl md:text-6xl font-black text-sky-300 tracking-wider">
                         {{ rollingName }}
                     </div>
-                    <div v-else class="text-slate-400 text-xs font-bold">
+                    <div v-else class="text-slate-400 text-lg md:text-2xl font-bold">
                         點擊下方按鈕隨機抽取學生！
                     </div>
                 </div>
 
-                <button @click="startRandomPick" :disabled="isRolling" class="py-2.5 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white rounded-xl font-black text-base shadow-lg transition disabled:opacity-50">
+                <div class="flex flex-wrap items-center justify-center gap-3 text-base md:text-xl text-slate-200 font-bold">
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" v-model="excludePickedStudents" class="w-5 h-5 accent-sky-500"> 已抽過的學生不再重複</label>
+                    <span class="text-sky-200">剩餘 {{ remainingPickCount }} / {{ students.length }} 人</span>
+                    <button @click="resetPickedStudents" :disabled="isRolling" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-xl disabled:opacity-40">↻ 重新加入全班學生</button>
+                </div>
+                <button @click="startRandomPick" :disabled="isRolling || (excludePickedStudents && remainingPickCount===0)" class="py-4 text-xl md:text-2xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white rounded-xl font-black text-base shadow-lg transition disabled:opacity-50">
                     {{ isRolling ? '抽取中...' : '🎲 開始個人抽籤' }}
                 </button>
             </div>
@@ -952,9 +1102,9 @@
 
         <!-- 小組隨機排序 Modal -->
         <div v-if="showGroupShuffleModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-            <div class="glass-panel w-full max-w-md rounded-3xl p-5 shadow-2xl text-center flex flex-col gap-4 border border-purple-500/30">
+            <div class="glass-panel w-full max-w-5xl max-h-[94vh] overflow-y-auto rounded-3xl p-6 md:p-10 shadow-2xl text-center flex flex-col gap-5 border border-purple-500/30">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                    <h2 class="text-base font-black text-purple-300 flex items-center gap-2">
+                    <h2 class="text-xl md:text-3xl font-black text-purple-300 flex items-center gap-2">
                         <i class="fa-solid fa-shuffle text-purple-400"></i> 1～6 小組發表與任務隨機排序
                     </h2>
                     <button @click="showGroupShuffleModal = false" class="text-slate-400 hover:text-white">
@@ -962,23 +1112,23 @@
                     </button>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2.5 py-2">
+                <div class="grid grid-cols-2 gap-3 md:gap-5 py-3">
                     <div v-for="(group, rank) in shuffledGroups" :key="group"
                          :class="[
-                             'p-3 rounded-2xl flex items-center justify-between border-2 transition-all duration-300 shadow-md',
+                             'p-4 md:p-7 min-h-[95px] md:min-h-[130px] rounded-2xl flex items-center justify-between border-2 transition-all duration-300 shadow-md',
                              rank === 0 ? 'bg-amber-500/20 border-amber-400 text-amber-200' :
                              (rank === 1 ? 'bg-slate-300/20 border-slate-300 text-slate-100' :
                              (rank === 2 ? 'bg-amber-700/20 border-amber-600 text-amber-300' : 'bg-slate-900/90 border-slate-700 text-slate-200'))
                          ]">
-                        <span class="text-xs font-black px-2 py-0.5 rounded-lg"
+                        <span class="text-sm md:text-xl font-black px-2 py-1 rounded-lg"
                               :class="rank === 0 ? 'bg-amber-400 text-slate-950' : (rank === 1 ? 'bg-slate-300 text-slate-950' : (rank === 2 ? 'bg-amber-600 text-white' : 'bg-slate-800 text-slate-400'))">
                             第 {{ rank + 1 }} 順位
                         </span>
-                        <span class="text-lg md:text-xl font-black tracking-wide">{{ group }}</span>
+                        <span class="text-2xl md:text-4xl font-black tracking-wide">{{ group }}</span>
                     </div>
                 </div>
 
-                <button @click="startGroupShuffle" :disabled="isGroupShuffling" class="py-2.5 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500 text-white rounded-xl font-black text-base shadow-lg transition disabled:opacity-50">
+                <button @click="startGroupShuffle" :disabled="isGroupShuffling" class="py-4 text-xl md:text-2xl bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500 text-white rounded-xl font-black text-base shadow-lg transition disabled:opacity-50">
                     {{ isGroupShuffling ? '洗牌中...' : '🎲 重新小組隨機排序' }}
                 </button>
             </div>
@@ -986,9 +1136,9 @@
 
         <!-- 課堂倒數計時器 Modal -->
         <div v-if="showTimerModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-            <div class="glass-panel w-full max-w-sm rounded-3xl p-5 shadow-2xl text-center flex flex-col gap-3 border border-emerald-500/30">
+            <div class="glass-panel w-full max-w-4xl max-h-[94vh] overflow-y-auto rounded-3xl p-6 md:p-10 shadow-2xl text-center flex flex-col gap-6 border border-emerald-500/30">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                    <h2 class="text-base font-black text-emerald-300 flex items-center gap-2">
+                    <h2 class="text-xl md:text-3xl font-black text-emerald-300 flex items-center gap-2">
                         <i class="fa-solid fa-stopwatch text-emerald-400"></i> 課堂倒數計時器
                     </h2>
                     <button @click="showTimerModal = false" class="text-slate-400 hover:text-white">
@@ -996,16 +1146,22 @@
                     </button>
                 </div>
 
-                <div class="py-4 bg-slate-950 text-emerald-400 font-mono text-5xl font-black rounded-2xl border border-emerald-900/60 shadow-inner">
+                <div class="py-8 md:py-12 bg-slate-950 text-emerald-400 font-mono text-7xl md:text-[120px] font-black rounded-2xl border border-emerald-900/60 shadow-inner">
                     {{ formattedTimerMinutes }}:{{ formattedTimerSeconds }}
                 </div>
 
                 <div class="flex justify-center gap-1.5">
-                    <button v-for="m in [1, 3, 5, 10, 15]" :key="m" @click="setTimerMinutes(m)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-indigo-300 rounded-lg font-bold text-xs border border-slate-700">
+                    <button v-for="m in [1, 3, 5, 10, 15]" :key="m" @click="setTimerMinutes(m)" class="px-3 md:px-5 py-2 md:py-3 bg-slate-800 hover:bg-slate-700 text-indigo-300 rounded-lg font-bold text-base md:text-xl border border-slate-700">
                         {{ m }} 分
                     </button>
                 </div>
 
+                <div class="flex flex-wrap justify-center items-center gap-3 text-white text-lg md:text-2xl font-bold">
+                    <span>自訂時間</span>
+                    <input v-model.number="customTimerMinutes" type="number" min="0" max="999" class="w-24 md:w-32 bg-slate-900 border border-slate-600 rounded-xl p-2 text-center text-white" aria-label="分鐘"> 分
+                    <input v-model.number="customTimerSeconds" type="number" min="0" max="59" class="w-24 md:w-32 bg-slate-900 border border-slate-600 rounded-xl p-2 text-center text-white" aria-label="秒數"> 秒
+                    <button @click="applyCustomTimer" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-xl">設定時間</button>
+                </div>
                 <div class="flex gap-2 mt-1">
                     <button @click="toggleTimer" class="flex-1 py-2 rounded-xl font-bold text-white shadow transition" :class="isTimerRunning ? 'bg-amber-600 hover:bg-amber-500' : 'bg-emerald-600 hover:bg-emerald-500'">
                         {{ isTimerRunning ? '暫停' : '開始倒數' }}
@@ -1499,6 +1655,10 @@
                 const isRolling = ref(false);
                 const rollingName = ref('');
                 const pickedStudent = ref(null);
+                const excludePickedStudents = ref(true);
+                const pickedStudentIds = ref([]);
+                const remainingPickCount = computed(() => students.value.filter(s => !pickedStudentIds.value.includes(String(s.id))).length);
+                const resetPickedStudents = () => { pickedStudentIds.value = []; pickedStudent.value = null; };
 
                 // 小組隨機排序
                 const showGroupShuffleModal = ref(false);
@@ -1547,6 +1707,9 @@
 
                 const showTimerModal = ref(false);
                 const timerSecondsTotal = ref(300);
+                const timerInitialSeconds = ref(300);
+                const customTimerMinutes = ref(5);
+                const customTimerSeconds = ref(0);
                 const isTimerRunning = ref(false);
                 let timerInterval = null;
 
@@ -1747,18 +1910,18 @@
                         if (!hasStudentPending(student) && getStudentReminders(student).length > 0) {
                             return 'border-yellow-300 bg-yellow-400 text-slate-950 shadow-[0_0_20px_rgba(250,204,21,0.5)]';
                         }
-                        return 'border-amber-400/90 bg-amber-950/80 text-amber-100 glow-amber';
+                        return 'pastel-card border-amber-400/90 bg-amber-950/80 text-amber-100 glow-amber';
                     }
                     if (student.missing && student.missing.length > 0) {
-                        return 'border-rose-600/80 bg-rose-950/40 glow-rose';
+                        return 'pastel-card border-rose-600/80 bg-rose-950/40 glow-rose';
                     }
                     if (student.correction && student.correction.length > 0) {
-                        return 'border-amber-500/80 bg-amber-950/40 glow-amber';
+                        return 'pastel-card border-amber-500/80 bg-amber-950/40 glow-amber';
                     }
                     if (student.signature && student.signature.length > 0) {
-                        return 'border-purple-500/80 bg-purple-950/40 glow-purple';
+                        return 'pastel-card border-purple-500/80 bg-purple-950/40 glow-purple';
                     }
-                    return 'border-emerald-800/40 bg-slate-900/80 hover:border-emerald-500/60';
+                    return 'pastel-card border-emerald-800/40 bg-slate-900/80 hover:border-emerald-500/60';
                 };
 
                 const handleStudentClick = (student) => {
@@ -1846,22 +2009,25 @@
                 };
 
                 const startRandomPick = () => {
-                    if (students.value.length === 0) return;
+                    const pool = excludePickedStudents.value
+                        ? students.value.filter(s => !pickedStudentIds.value.includes(String(s.id)))
+                        : students.value;
+                    if (pool.length === 0 || isRolling.value) return;
                     isRolling.value = true;
                     pickedStudent.value = null;
                     let counter = 0;
                     const maxCount = 20;
-
                     const interval = setInterval(() => {
-                        const randomIndex = Math.floor(Math.random() * students.value.length);
-                        rollingName.value = `${students.value[randomIndex].id} 號 ${students.value[randomIndex].name}`;
+                        const randomIndex = Math.floor(Math.random() * pool.length);
+                        rollingName.value = `${pool[randomIndex].id} 號 ${pool[randomIndex].name}`;
                         playSound('beep');
                         counter++;
-
                         if (counter >= maxCount) {
                             clearInterval(interval);
                             isRolling.value = false;
-                            pickedStudent.value = students.value[randomIndex];
+                            const chosen = pool[randomIndex];
+                            pickedStudent.value = chosen;
+                            if (!pickedStudentIds.value.includes(String(chosen.id))) pickedStudentIds.value.push(String(chosen.id));
                             playSound('star');
                             triggerConfetti();
                         }
@@ -1884,8 +2050,24 @@
                 });
 
                 const setTimerMinutes = (mins) => {
-                    timerSecondsTotal.value = mins * 60;
-                    if (isTimerRunning.value) resetTimer();
+                    clearInterval(timerInterval);
+                    isTimerRunning.value = false;
+                    timerInitialSeconds.value = mins * 60;
+                    timerSecondsTotal.value = timerInitialSeconds.value;
+                    customTimerMinutes.value = mins;
+                    customTimerSeconds.value = 0;
+                };
+
+                const applyCustomTimer = () => {
+                    const m = Math.max(0, Math.min(999, Math.floor(Number(customTimerMinutes.value) || 0)));
+                    const sec = Math.max(0, Math.min(59, Math.floor(Number(customTimerSeconds.value) || 0)));
+                    if (m * 60 + sec === 0) { showToast('請設定大於 0 秒的時間'); return; }
+                    clearInterval(timerInterval);
+                    isTimerRunning.value = false;
+                    customTimerMinutes.value = m;
+                    customTimerSeconds.value = sec;
+                    timerInitialSeconds.value = m * 60 + sec;
+                    timerSecondsTotal.value = timerInitialSeconds.value;
                 };
 
                 const toggleTimer = () => {
@@ -1912,7 +2094,7 @@
                 const resetTimer = () => {
                     clearInterval(timerInterval);
                     isTimerRunning.value = false;
-                    timerSecondsTotal.value = 300;
+                    timerSecondsTotal.value = timerInitialSeconds.value;
                 };
 
                 // 名冊管理
@@ -2139,6 +2321,9 @@
                     isRolling,
                     rollingName,
                     pickedStudent,
+                    excludePickedStudents,
+                    remainingPickCount,
+                    resetPickedStudents,
                     openRandomPicker,
                     startRandomPick,
                     showGroupShuffleModal,
@@ -2152,6 +2337,9 @@
                     isTimerRunning,
                     openTimer,
                     setTimerMinutes,
+                    customTimerMinutes,
+                    customTimerSeconds,
+                    applyCustomTimer,
                     toggleTimer,
                     resetTimer,
                     showRosterModal,
