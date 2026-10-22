@@ -346,6 +346,19 @@ body.pastel-whole-screen button.bg-emerald-700 *,
 body.pastel-whole-screen button.bg-teal-700 *,
 body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
 
+
+/* 2026-10-22 下課大屏：卡片尺寸固定，座號姓名同行；作業內容依項目數自動縮放 */
+.recess-student-card{justify-content:space-between!important}
+.recess-student-card .recess-inline-name{font-size:clamp(20px,2.15vw,37px)!important;line-height:1.08!important;color:#173249!important;padding:0 3px}
+.recess-student-card .recess-task-list{flex:1;min-height:0;align-content:center;justify-content:center;gap:clamp(3px,.45vw,9px)!important;overflow:hidden}
+.recess-student-card .recess-task-chip{font-size:clamp(12px,1.6vw,29px)!important;line-height:1.18!important;padding:clamp(4px,.55vh,10px) clamp(5px,.6vw,12px)!important;white-space:normal;overflow-wrap:anywhere;text-align:center;max-width:100%;flex-shrink:1!important}
+.recess-student-card .recess-task-list[style*="--task-count: 2"] .recess-task-chip{font-size:clamp(12px,1.25vw,23px)!important}
+.recess-student-card .recess-task-list[style*="--task-count: 3"] .recess-task-chip,
+.recess-student-card .recess-task-list[style*="--task-count: 4"] .recess-task-chip{font-size:clamp(11px,1.05vw,19px)!important;padding:3px 5px!important}
+.recess-student-card .recess-task-list[style*="--task-count: 5"] .recess-task-chip,
+.recess-student-card .recess-task-list[style*="--task-count: 6"] .recess-task-chip{font-size:clamp(10px,.85vw,16px)!important;padding:2px 4px!important}
+@media(max-height:720px){.recess-student-card .recess-inline-name{font-size:clamp(16px,1.8vw,29px)!important}.recess-student-card .recess-task-chip{font-size:clamp(12px,1.3vw,23px)!important}}
+
 </style>
 </head>
 <body class="pastel-whole-screen h-screen w-screen overflow-hidden">
@@ -815,7 +828,7 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                                      getStudentCardStyle(student)
                                  ]">
                                 
-                                <!-- 卡片頂部：一般模式座號與姓名同行，大屏模式姓名置中 -->
+                                <!-- 卡片頂部：座號與姓名在下課大屏模式也同行 -->
                                 <div class="flex items-center justify-between w-full" :class="!isRecessMode ? 'gap-1.5' : ''">
                                     <span :class="[
                                         'rounded-xl font-black flex items-center justify-center shadow-md shrink-0',
@@ -824,7 +837,7 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                                         {{ student.id }}
                                     </span>
 
-                                    <span v-if="!isRecessMode" class="normal-inline-name flex-1 min-w-0 text-center font-black truncate">{{ student.name }}</span>
+                                    <span class="normal-inline-name flex-1 min-w-0 text-center font-black truncate" :class="isRecessMode ? 'recess-inline-name' : ''">{{ student.name }}</span>
 
                                     <button v-if="hasStudentPending(student)" 
                                             @click.stop="clearStudentStatus(student)"
@@ -835,7 +848,7 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                                 </div>
 
                                 <!-- 學生姓名：清晰置中與字型適應 -->
-                                <div v-if="isRecessMode" class="text-center my-1 w-full">
+                                <div v-if="false && isRecessMode" class="text-center my-1 w-full">
                                     <h3 :class="[
                                         'font-black tracking-wide leading-tight truncate',
                                         isRecessMode ? (!hasStudentPending(student) && getStudentReminders(student).length ? 'text-xl sm:text-2xl md:text-[30px] lg:text-[32px] text-slate-950' : 'text-xl sm:text-2xl md:text-[30px] lg:text-[32px] text-amber-100') : 'text-base md:text-lg text-slate-100'
@@ -853,7 +866,7 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                                 </div>
 
                                 <!-- 三大獨立欄位標籤區 (🔴 缺交 / 🟡 訂正 / 🟣 補簽名) -->
-                                <div class="w-full flex flex-wrap gap-1 items-center justify-center min-h-[28px]">
+                                <div class="w-full flex flex-wrap gap-1 items-center justify-center min-h-[28px]" :class="isRecessMode ? 'recess-task-list' : ''" :style="isRecessMode ? {'--task-count': (student.missing?.length || 0) + (student.correction?.length || 0) + (student.signature?.length || 0)} : {}">
                                     
                                     <!-- 🔴 缺交項目 -->
                                     <template v-if="student.missing && student.missing.length > 0">
@@ -861,7 +874,7 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                                                 @click.stop="studentSelfCheckoff(student, 'missing', i)"
                                                 :class="[
                                                     'bg-rose-600 hover:bg-rose-500 active:scale-95 text-white font-black rounded-lg flex items-center gap-0.5 shadow transition border border-rose-400/40 cursor-pointer shrink-0',
-                                                    isRecessMode ? 'text-xs md:text-sm px-2 py-0.5' : 'text-[11px] md:text-xs px-1.5 py-0.5'
+                                                    isRecessMode ? 'recess-task-chip px-2 py-1' : 'text-[11px] md:text-xs px-1.5 py-0.5'
                                                 ]"
                                                 :title="'點擊【' + item + '】表示補交完成！'">
                                             <span>缺:{{ item }}</span>
@@ -875,7 +888,7 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                                                 @click.stop="studentSelfCheckoff(student, 'correction', i)"
                                                 :class="[
                                                     'bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black rounded-lg flex items-center gap-0.5 shadow transition cursor-pointer shrink-0 border border-amber-300',
-                                                    isRecessMode ? 'text-xs md:text-sm px-2 py-0.5' : 'text-[11px] md:text-xs px-1.5 py-0.5'
+                                                    isRecessMode ? 'recess-task-chip px-2 py-1' : 'text-[11px] md:text-xs px-1.5 py-0.5'
                                                 ]"
                                                 :title="'點擊【' + item + '】表示訂正完成！'">
                                             <span>訂:{{ item }}</span>
@@ -889,7 +902,7 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                                                 @click.stop="studentSelfCheckoff(student, 'signature', i)"
                                                 :class="[
                                                     'bg-purple-600 hover:bg-purple-500 active:scale-95 text-white font-black rounded-lg flex items-center gap-0.5 shadow transition cursor-pointer shrink-0 border border-purple-300',
-                                                    isRecessMode ? 'text-xs md:text-sm px-2 py-0.5' : 'text-[11px] md:text-xs px-1.5 py-0.5'
+                                                    isRecessMode ? 'recess-task-chip px-2 py-1' : 'text-[11px] md:text-xs px-1.5 py-0.5'
                                                 ]"
                                                 :title="'點擊【' + item + '】表示補簽完成！'">
                                             <span>簽:{{ item }}</span>
