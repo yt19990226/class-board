@@ -359,6 +359,96 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
 .recess-student-card .recess-task-list[style*="--task-count: 6"] .recess-task-chip{font-size:clamp(10px,.85vw,16px)!important;padding:2px 4px!important}
 @media(max-height:720px){.recess-student-card .recess-inline-name{font-size:clamp(16px,1.8vw,29px)!important}.recess-student-card .recess-task-chip{font-size:clamp(12px,1.3vw,23px)!important}}
 
+/* 聯絡簿時鐘：沿用大屏的時間資料與視覺風格，避免新增計時器 */
+.cb-top > .flex{min-width:0;flex:1}
+.cb-header-clock{flex:none;white-space:nowrap}
+.cb-clock-face{position:relative;display:block}
+.cb-clock-hand{position:absolute;left:50%;bottom:50%;transform-origin:50% 100%;border-radius:8px}
+.cb-hour-hand{width:3px;height:27%;background:#f8fafc}
+.cb-minute-hand{width:2px;height:36%;background:#e2e8f0}
+.cb-second-hand{width:1.5px;height:40%;background:#34d399}
+.cb-clock-dot{position:absolute;left:50%;top:50%;width:5px;height:5px;transform:translate(-50%,-50%);background:#34d399;border-radius:50%}
+@media(max-width:950px){.cb-header-clock{padding:4px 7px;gap:6px}.cb-header-clock .board-digital-clock{font-size:21px}}
+
+/* 2026-10-29：聯絡簿直排文字滿高後自動往左換欄，避免縮成細長單欄 */
+.cb-writing{align-items:stretch;column-gap:clamp(6px,.8vw,16px)}
+.cb-writing .cb-item{writing-mode:vertical-rl;text-orientation:upright;white-space:normal;
+  height:100%;max-height:100%;width:max-content;max-width:none;min-width:1.2em;
+  overflow-wrap:anywhere;word-break:normal;line-height:1.22;flex:0 0 auto;}
+.cb-writing .cb-date{height:100%;flex:0 0 auto;align-self:flex-start}
+/* 時鐘僅佔右上角所需空間，不撐滿整列 */
+.cb-top > .flex{flex:0 1 auto;min-width:0}
+.cb-header-clock{flex:0 0 auto;width:max-content;max-width:100%;padding:5px 11px!important;gap:9px!important}
+.cb-header-clock .board-analog-clock{width:47px;height:47px}
+.cb-header-clock .board-digital-clock{font-size:clamp(23px,2.1vw,34px);line-height:1.08}
+/* 早修任務：每格獨立使用自身的容器大小計算字級，兩項時不再縮小 */
+.cb-left-new .cb-morning-panel .cb-morning-entry{container-type:size;overflow:hidden}
+.cb-left-new .cb-morning-panel .cb-morning-entry .cb-fill-text,
+.cb-left-new .cb-morning-panel .cb-fill-list.cb-n-2 .cb-morning-entry .cb-fill-text,
+.cb-left-new .cb-morning-panel .cb-morning-entry.cb-long .cb-fill-text,
+.cb-left-new .cb-morning-panel .cb-morning-entry.cb-very-long .cb-fill-text{
+  font-size:clamp(25px,min(17cqw,32cqh),92px)!important;
+  line-height:1.15!important;max-width:100%;max-height:100%;
+  text-align:center;overflow-wrap:anywhere;
+}
+.cb-left-new .cb-morning-panel .cb-morning-entry.cb-long .cb-fill-text{font-size:clamp(23px,min(13cqw,26cqh),72px)!important}
+.cb-left-new .cb-morning-panel .cb-morning-entry.cb-very-long .cb-fill-text{font-size:clamp(20px,min(10cqw,19cqh),58px)!important}
+/* 撤銷按鈕固定於大屏可見處，與聯絡簿及教師對話框不衝突 */
+.student-undo-btn{position:fixed;right:20px;bottom:22px;z-index:34;background:#fff7d6;color:#6b3900;
+ border:2px solid #eab308;border-radius:999px;padding:11px 18px;font-weight:900;
+ box-shadow:0 6px 22px #0006;cursor:pointer;font-size:clamp(15px,1.25vw,21px)}
+.student-undo-btn:hover{background:#fef08a}
+
+/* 主畫面時鐘：日期、數位時間、星期各自橫排，均分右側可用空間 */
+header > .board-header-clock:not(.cb-header-clock){
+  flex:1 1 45%; min-width:0; max-width:none; width:auto!important;
+  display:flex; align-items:center; justify-content:space-between!important;
+  padding:7px 14px!important; gap:clamp(8px,1vw,20px)!important;
+}
+header > .board-header-clock:not(.cb-header-clock) .board-analog-clock{
+  width:clamp(48px,4vw,68px);height:clamp(48px,4vw,68px);flex-shrink:0;
+}
+header > .board-header-clock:not(.cb-header-clock) .board-clock-parts{
+  display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.2fr) minmax(0,.7fr);
+  gap:clamp(8px,1.1vw,24px);align-items:center;justify-items:center;
+  flex:1;min-width:0;
+}
+header > .board-header-clock:not(.cb-header-clock) .board-clock-date{
+  font-size:clamp(17px,1.65vw,31px);font-weight:900;white-space:nowrap;color:#405b79;
+}
+header > .board-header-clock:not(.cb-header-clock) .board-clock-time{
+  font-size:clamp(26px,2.4vw,48px)!important;line-height:1.05;color:#087b72;white-space:nowrap;
+}
+header > .board-header-clock:not(.cb-header-clock) .board-clock-weekday{
+  font-size:clamp(19px,1.8vw,35px);font-weight:900;white-space:nowrap;color:#4b4c93;
+}
+@media(max-width:1250px){
+  header > .board-header-clock:not(.cb-header-clock) .board-clock-parts{gap:8px}
+  header > .board-header-clock:not(.cb-header-clock) .board-clock-date{font-size:clamp(13px,1.4vw,22px)}
+  header > .board-header-clock:not(.cb-header-clock) .board-clock-time{font-size:clamp(20px,2vw,32px)!important}
+  header > .board-header-clock:not(.cb-header-clock) .board-clock-weekday{font-size:clamp(15px,1.5vw,25px)}
+}
+@media(max-width:760px){
+  header > .board-header-clock:not(.cb-header-clock){flex-basis:100%;}
+  header > .board-header-clock:not(.cb-header-clock) .board-clock-parts{grid-template-columns:1fr 1.1fr .7fr}
+}
+
+
+/* 大屏互動工具：三個彩色按鈕一律使用白色文字與圖示 */
+body.pastel-whole-screen aside .glass-panel:has(.fa-toolbox) .grid button,
+body.pastel-whole-screen aside .glass-panel:has(.fa-toolbox) .grid button * {
+  color:#fff!important;
+}
+/* 聯絡簿：日期／時間／星期分成三個橫向區塊，保持指針時鐘 */
+.cb-top .cb-header-clock {display:flex;align-items:center;flex:0 1 auto;min-width:0;width:auto;max-width:100%;gap:clamp(8px,1vw,18px)!important;padding:7px 13px!important}
+.cb-top .cb-header-clock .board-analog-clock {width:clamp(42px,4vw,62px);height:clamp(42px,4vw,62px);flex-shrink:0}
+.cb-top .cb-clock-parts {display:grid;grid-template-columns:max-content max-content max-content;align-items:center;gap:clamp(9px,1.3vw,26px);min-width:0}
+.cb-top .cb-clock-date {font-size:clamp(14px,1.4vw,25px);font-weight:800;white-space:nowrap;color:#455f7a}
+.cb-top .cb-clock-time {font-size:clamp(23px,2.2vw,42px)!important;line-height:1.1;white-space:nowrap;color:#087b72!important}
+.cb-top .cb-clock-weekday {font-size:clamp(16px,1.6vw,30px);font-weight:900;white-space:nowrap;color:#4b4c93}
+@media(max-width:1150px){.cb-top .cb-clock-parts{gap:7px}.cb-top .cb-clock-date{font-size:14px}.cb-top .cb-clock-time{font-size:23px!important}.cb-top .cb-clock-weekday{font-size:16px}}
+@media(max-width:750px){.cb-top .cb-header-clock{max-width:100%;padding:5px 7px!important}.cb-top .cb-header-clock .board-analog-clock{width:38px;height:38px}.cb-top .cb-clock-date{font-size:12px}.cb-top .cb-clock-time{font-size:19px!important}.cb-top .cb-clock-weekday{font-size:13px}}
+
 </style>
 </head>
 <body class="pastel-whole-screen h-screen w-screen overflow-hidden">
@@ -375,7 +465,19 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
               <button class="cb-btn" @click="contactPreviewDate=contactToday()">顯示今天</button>
               <input type="date" v-model="contactPreviewDate" aria-label="查看聯絡簿日期" style="background:#f0fdf4;color:#123d31;border-radius:8px;padding:7px" />
             </div>
-            <strong style="font-size:clamp(16px,1.5vw,25px)">{{ contactDateLabel(contactToday()) }}</strong>
+            <div class="cb-header-clock board-header-clock flex items-center gap-3 bg-slate-900/90 text-white px-3.5 py-1.5 rounded-xl border border-slate-700/60" aria-label="現在日期與時間">
+              <div class="board-analog-clock cb-clock-face relative bg-slate-800 rounded-full border border-slate-600 shrink-0 shadow-inner">
+                <span class="cb-clock-hand cb-hour-hand" :style="{transform:'translateX(-50%) rotate('+((currentTime.getHours()%12+currentTime.getMinutes()/60)*30)+'deg)'}"></span>
+                <span class="cb-clock-hand cb-minute-hand" :style="{transform:'translateX(-50%) rotate('+(currentTime.getMinutes()*6+currentTime.getSeconds()/10)+'deg)'}"></span>
+                <span class="cb-clock-hand cb-second-hand" :style="{transform:'translateX(-50%) rotate('+(currentTime.getSeconds()*6)+'deg)'}"></span>
+                <span class="cb-clock-dot"></span>
+              </div>
+              <div class="cb-clock-parts" aria-label="日期、時間、星期">
+                <span class="cb-clock-date">{{ currentDateString }}</span>
+                <span class="board-digital-clock cb-clock-time font-black font-mono">{{ currentTimeString }}</span>
+                <span class="cb-clock-weekday">{{ currentDayOfWeek }}</span>
+              </div>
+            </div>
           </div>
           <div class="cb-main">
             <aside class="cb-left cb-left-new">
@@ -415,7 +517,7 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
               <div v-if="!contactShownTasks.length" style="align-self:center;margin:auto;font-size:30px;color:#d1fae5">這一天尚未編輯聯絡簿</div>
             </div>
           </div>
-          <div style="text-align:right;color:#a7d6c3;font-size:12px">{{contactSyncStatus}}　｜　聯絡簿從右往左排列，內容較多時自動縮小字體</div>
+          <div style="text-align:right;color:#a7d6c3;font-size:12px">{{contactSyncStatus}}　｜　聯絡簿從右往左排列，內容較長時自動往左換欄</div>
         </section>
         <div v-if="contactEditorOpen" class="cb-editor" @click.self="contactEditorOpen=false">
           <div class="cb-dialog">
@@ -512,14 +614,10 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                 <div class="board-analog-clock relative bg-slate-800 rounded-full border border-slate-600 flex items-center justify-center shrink-0 shadow-inner">
                     <canvas ref="analogClockCanvas" width="44" height="44" class="w-full h-full"></canvas>
                 </div>
-                <div class="text-right">
-                    <div class="text-[11px] text-indigo-300 font-medium tracking-wider flex items-center justify-end gap-1.5">
-                        <span>{{ currentDateString }}</span>
-                        <span class="bg-indigo-900/80 text-indigo-200 px-1.5 py-0.2 rounded text-[10px]">{{ currentDayOfWeek }}</span>
-                    </div>
-                    <div class="board-digital-clock font-black tracking-tight font-mono text-emerald-400">
-                        {{ currentTimeString }}
-                    </div>
+                <div class="board-clock-parts" aria-label="現在日期、時間與星期">
+                    <div class="board-clock-date">{{ currentDateString }}</div>
+                    <div class="board-digital-clock board-clock-time font-black font-mono">{{ currentTimeString }}</div>
+                    <div class="board-clock-weekday">{{ currentDayOfWeek }}</div>
                 </div>
             </div>
         </header>
@@ -571,6 +669,12 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                         </button>
                     </div>
 
+                    <!-- 教師可增刪常用快捷項目，隨班級同步 -->
+                    <div class="flex gap-1.5 items-center mt-1">
+                        <input v-model="newQuickSubject" @keyup.enter="addQuickSubject" maxlength="24" placeholder="新增常用按鈕名稱" aria-label="新增常用按鈕名稱" class="min-w-0 flex-1 text-xs bg-slate-900/90 border border-slate-700 rounded-lg px-2 py-1.5 text-slate-100 outline-none focus:border-amber-400">
+                        <button @click="addQuickSubject" class="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white">＋新增</button>
+                        <button @click="editingQuickSubjects = !editingQuickSubjects" class="text-xs px-2 py-1.5 rounded-lg border border-slate-500 text-slate-700">{{ editingQuickSubjects ? '完成' : '管理' }}</button>
+                    </div>
                     <!-- 常用科目快捷標籤 -->
                     <div class="flex flex-wrap gap-1 mt-0.5">
                         <button v-for="subj in defaultSubjects" 
@@ -582,6 +686,7 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                                 ]">
                             {{ subj }}
                         </button>
+                        <button v-if="editingQuickSubjects" v-for="subj in defaultSubjects" :key="'delete_'+subj" @click="removeQuickSubject(subj)" class="text-[11px] bg-rose-100 text-rose-700 rounded px-1.5 py-1" :title="'移除 '+subj">× {{ subj }}</button>
                     </div>
                 </div>
 
@@ -877,7 +982,7 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                                                     isRecessMode ? 'recess-task-chip px-2 py-1' : 'text-[11px] md:text-xs px-1.5 py-0.5'
                                                 ]"
                                                 :title="'點擊【' + item + '】表示補交完成！'">
-                                            <span>缺:{{ item }}</span>
+                                            <span>{{ getTaskDateLabel(student, 'missing', item) }}缺:{{ item }}</span>
                                             <i class="fa-solid fa-check text-[8px] bg-rose-800/90 rounded-full px-0.5"></i>
                                         </button>
                                     </template>
@@ -891,7 +996,7 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                                                     isRecessMode ? 'recess-task-chip px-2 py-1' : 'text-[11px] md:text-xs px-1.5 py-0.5'
                                                 ]"
                                                 :title="'點擊【' + item + '】表示訂正完成！'">
-                                            <span>訂:{{ item }}</span>
+                                            <span>{{ getTaskDateLabel(student, 'correction', item) }}訂:{{ item }}</span>
                                             <i class="fa-solid fa-check text-[8px] bg-amber-700 text-white rounded-full px-0.5"></i>
                                         </button>
                                     </template>
@@ -905,7 +1010,7 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                                                     isRecessMode ? 'recess-task-chip px-2 py-1' : 'text-[11px] md:text-xs px-1.5 py-0.5'
                                                 ]"
                                                 :title="'點擊【' + item + '】表示補簽完成！'">
-                                            <span>簽:{{ item }}</span>
+                                            <span>{{ getTaskDateLabel(student, 'signature', item) }}簽:{{ item }}</span>
                                             <i class="fa-solid fa-check text-[8px] bg-purple-800 text-white rounded-full px-0.5"></i>
                                         </button>
                                     </template>
@@ -1208,6 +1313,7 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
         </div>
 
         <!-- Toast 浮動提示 -->
+        <button v-if="!contactBoardOpen && studentUndoHistory.length" class="student-undo-btn" @click="undoStudentCheckoff" title="撤銷上一次學生點選的完成項目">↶ 返回上一步（{{studentUndoHistory.length}}）</button>
         <div v-if="toastMessage" class="fixed bottom-6 right-6 bg-slate-900 text-white px-4 py-2.5 rounded-2xl border border-indigo-500/50 shadow-2xl z-50 flex items-center gap-2 text-xs font-bold animate-bounce">
             <i class="fa-solid fa-circle-check text-emerald-400"></i>
             <span>{{ toastMessage }}</span>
@@ -1362,11 +1468,13 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                     const el=contactWriting.value;if(!el)return;
                     const cols=el.querySelectorAll('.cb-column');if(!cols.length)return;
                     const w=el.clientWidth-10,h=el.clientHeight-14,n=cols.length;
-                    // 從最大字級往下找；用實際 DOM 寬高確認適合一頁顯示。
-                    for(let px=76;px>=24;px-=2){contactFontSize.value=px;el.style.setProperty('--cb-font-size',px+'px');
-                        const total=Array.from(cols).reduce((sum,c)=>sum+c.getBoundingClientRect().width,0)+(n-1)*Math.min(24,Math.max(7,window.innerWidth*.012));
-                        const tallest=Math.max(...Array.from(cols).map(c=>c.getBoundingClientRect().height));
-                        if(total<=w&&tallest<=h)break;
+                    // 先讓每個作業在可用高度內自然向左換欄，再按實際總寬度微調字級。
+                    // 不以最長作業的字數直接縮小所有文字。
+                    for(let px=66;px>=28;px-=2){
+                        contactFontSize.value=px;el.style.setProperty('--cb-font-size',px+'px');
+                        const total=Array.from(cols).reduce((sum,c)=>sum+c.getBoundingClientRect().width,0)
+                            +(n-1)*Math.min(16,Math.max(6,window.innerWidth*.008));
+                        if(total<=w)break;
                     }
                 };
                 watch([contactShownTasks,contactBoardOpen,contactPreviewDate],()=>nextTick(fitContactText),{deep:true});
@@ -1399,6 +1507,30 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                 const defaultSubjects = ref([
                     '國習', '國練', '國隨', '數習', '數重', '數八格', '聽寫本', '聯絡簿', '英語卷'
                 ]);
+
+                const newQuickSubject = ref('');
+                const editingQuickSubjects = ref(false);
+                const addQuickSubject = () => {
+                    const name = newQuickSubject.value.trim();
+                    if (!name) return showToast('請輸入按鈕名稱');
+                    if (defaultSubjects.value.includes(name)) return showToast('這個按鈕已存在');
+                    defaultSubjects.value.push(name);
+                    newQuickSubject.value = '';
+                    saveAllData();
+                    showToast('已新增常用按鈕：' + name);
+                };
+                const removeQuickSubject = (name) => {
+                    defaultSubjects.value = defaultSubjects.value.filter(x => x !== name);
+                    saveAllData();
+                };
+                // 作業建立日期存於學生的 taskDates，原有科目陣列格式不變。
+                const taskDateKey = (type, subject) => type + ':' + subject;
+                const getTaskDateLabel = (student, type, subject) => {
+                    const date = student?.taskDates?.[taskDateKey(type,subject)];
+                    if (!date || date >= getTodayStr()) return '';
+                    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+                    return match ? `${Number(match[2])}/${Number(match[3])} ` : '';
+                };
 
                 // Web Audio API 音效
                 const playSound = (type) => {
@@ -1955,17 +2087,42 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                     if (!student[type]) student[type] = [];
                     const list = student[type];
                     const index = list.indexOf(subject);
+                    if (!student.taskDates || typeof student.taskDates !== 'object') student.taskDates = {};
+                    const dateKey = taskDateKey(type,subject);
                     if (index > -1) {
                         list.splice(index, 1);
+                        delete student.taskDates[dateKey];
                     } else {
                         list.push(subject);
+                        student.taskDates[dateKey] = getTodayStr();
                     }
                     saveAllData();
                 };
 
+                // 僅記錄學生自行點選完成的動作；避免誤點其他人的訂正。
+                const studentUndoHistory = ref([]);
+                const undoStudentCheckoff = () => {
+                    const last=studentUndoHistory.value.pop();
+                    if(!last)return;
+                    const student=students.value.find(s=>String(s.id)===String(last.studentId));
+                    if(!student){showToast('找不到原本的學生，無法復原');return;}
+                    if(!Array.isArray(student[last.type]))student[last.type]=[];
+                    if(student[last.type].includes(last.item)){
+                        showToast('該項目已存在，無須復原');return;
+                    }
+                    student[last.type].splice(Math.min(last.index,student[last.type].length),0,last.item);
+                    if (!student.taskDates) student.taskDates = {};
+                    if (last.date) student.taskDates[taskDateKey(last.type,last.item)] = last.date;
+                    saveAllData();
+                    showToast(`↶ 已復原 ${student.name} 的【${last.item}】`);
+                };
                 const studentSelfCheckoff = (student, type, index) => {
+                    if(!Array.isArray(student[type])||index<0||index>=student[type].length)return;
                     const itemName = student[type][index];
+                    studentUndoHistory.value.push({studentId:student.id,type,index,item:itemName,date:student.taskDates?.[taskDateKey(type,itemName)]});
+                    if(studentUndoHistory.value.length>12)studentUndoHistory.value.shift();
                     student[type].splice(index, 1);
+                    if (student.taskDates) delete student.taskDates[taskDateKey(type,itemName)];
                     playSound('star');
                     
                     const actionName = type === 'missing' ? '補交' : (type === 'correction' ? '訂正' : '補簽');
@@ -2141,6 +2298,7 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                     const payload = {
                         className: className.value,
                         students: JSON.parse(JSON.stringify(students.value)),
+                        defaultSubjects: JSON.parse(JSON.stringify(defaultSubjects.value)),
                         todayHomework: JSON.parse(JSON.stringify(todayHomework.value)),
                         reminders: JSON.parse(JSON.stringify(reminders.value)),
                         updatedAt: Date.now()
@@ -2185,6 +2343,7 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                                 const data = snapshot.data();
                                 className.value = typeof data.className === 'string' ? data.className : '我的班級';
                                 students.value = Array.isArray(data.students) ? data.students : [];
+                                if (Array.isArray(data.defaultSubjects)) defaultSubjects.value = data.defaultSubjects.filter(x => typeof x === 'string' && x.trim());
                                 todayHomework.value = normalizeAnnouncements(data.todayHomework);
                                 reminders.value = Array.isArray(data.reminders) ? data.reminders : [];
                                 needsClassSetup.value = false;
@@ -2269,6 +2428,8 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                     isRecessMode,
                     recessGridRows,
                     defaultSubjects,
+                    newQuickSubject, editingQuickSubjects, addQuickSubject, removeQuickSubject,
+                    getTaskDateLabel,
                     students,
                     todayHomework,
                     activeHomeworkList,
@@ -2309,6 +2470,7 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                     recessAnnouncementClass,
                     hasStudentPending,
                     perfectStudentsCount,
+                    currentTime,
                     currentDateString,
                     currentDayOfWeek,
                     currentTimeString,
@@ -2327,6 +2489,7 @@ body.pastel-whole-screen button.bg-slate-700 *{color:#ffffff!important}
                     getStudentCardStyle,
                     toggleSubject,
                     studentSelfCheckoff,
+                    studentUndoHistory,undoStudentCheckoff,
                     clearStudentStatus,
                     clearAllTasks,
                     saveAllData,
