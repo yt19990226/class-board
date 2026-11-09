@@ -449,6 +449,475 @@ body.pastel-whole-screen aside .glass-panel:has(.fa-toolbox) .grid button * {
 @media(max-width:1150px){.cb-top .cb-clock-parts{gap:7px}.cb-top .cb-clock-date{font-size:14px}.cb-top .cb-clock-time{font-size:23px!important}.cb-top .cb-clock-weekday{font-size:16px}}
 @media(max-width:750px){.cb-top .cb-header-clock{max-width:100%;padding:5px 7px!important}.cb-top .cb-header-clock .board-analog-clock{width:38px;height:38px}.cb-top .cb-clock-date{font-size:12px}.cb-top .cb-clock-time{font-size:19px!important}.cb-top .cb-clock-weekday{font-size:13px}}
 
+
+/* 上一步／下一步與篩選標籤同行，不遮住學生卡片 */
+.student-history-toolbar{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
+.history-action-btn{border:1px solid #a5b4fc;background:#eef2ff;color:#3730a3;border-radius:10px;padding:6px 13px;font-size:13px;font-weight:800;white-space:nowrap;box-shadow:0 1px 3px #0001}
+.history-action-btn:hover:not(:disabled){background:#c7d2fe}
+.history-action-btn:disabled{opacity:.38;cursor:not-allowed}
+@media(max-width:850px){.student-history-toolbar{margin-left:0}.history-action-btn{padding:5px 9px;font-size:12px}}
+
+/* 2026-11-09 全站奶油點點馬卡龍視覺更新：僅 CSS，不更動 Vue / Firebase / undo-redo 邏輯 */
+:root{--cream:#fff9ef;--coffee:#594739;--coffee-soft:#8c7767;--line:#786153;--pink:#ffe1e9;--mint:#d9f5e9;--sky:#e0f1ff;--yellow:#fff0bc}
+body.pastel-whole-screen{
+  font-family:'Noto Sans TC',sans-serif!important;color:var(--coffee)!important;
+  background-color:var(--cream)!important;
+  background-image:radial-gradient(circle,#ffdccc 3px,transparent 3.5px),radial-gradient(circle,#d2edff 3px,transparent 3.5px)!important;
+  background-size:80px 80px!important;background-position:20px 16px,60px 56px!important;
+}
+body.pastel-whole-screen .glass-panel{
+  background:#fffefaed!important;border:2px solid #b9a393!important;
+  box-shadow:0 5px 0 #8c75621c!important;backdrop-filter:none!important;
+  color:var(--coffee)!important;border-radius:22px!important;
+}
+body.pastel-whole-screen header.glass-panel{
+  background:#fff9efed!important;border-color:#9d8170!important;
+}
+body.pastel-whole-screen .glass-panel :is(h1,h2,h3,h4),
+body.pastel-whole-screen :is(.text-slate-100,.text-slate-200,.text-slate-300,.text-slate-400){
+  color:var(--coffee)!important;
+}
+body.pastel-whole-screen :is(.glass-panel,.pastel-card,.recess-student-card) {
+  overflow-wrap:anywhere;
+}
+body.pastel-whole-screen .pastel-card{
+  border:2px solid #b9a393!important;box-shadow:0 3px 0 #9c82722b!important;
+}
+body.pastel-whole-screen .pastel-card:nth-child(6n+1){background:#ffe3e9!important}
+body.pastel-whole-screen .pastel-card:nth-child(6n+2){background:#fff0c8!important}
+body.pastel-whole-screen .pastel-card:nth-child(6n+3){background:#dff4e8!important}
+body.pastel-whole-screen .pastel-card:nth-child(6n+4){background:#e1f0ff!important}
+body.pastel-whole-screen .pastel-card:nth-child(6n+5){background:#f0e5fb!important}
+body.pastel-whole-screen .pastel-card:nth-child(6n){background:#ffe8d6!important}
+body.pastel-whole-screen .pastel-card h3,
+body.pastel-whole-screen .pastel-card .normal-inline-name{color:#4c3c31!important;text-shadow:none!important}
+body.pastel-whole-screen .recess-student-card h3{
+  white-space:normal!important;overflow:visible!important;text-overflow:clip!important;
+  overflow-wrap:anywhere!important;line-height:1.14!important;
+}
+body.pastel-whole-screen .recess-student-card{
+  overflow-y:auto!important;scrollbar-width:thin;
+}
+body.pastel-whole-screen :is(.recess-pending-announcements,.cb-reminder-spotlight){
+  background:#fff2d7!important;border:2px solid #a98c76!important;
+  color:var(--coffee)!important;border-radius:20px!important;
+}
+body.pastel-whole-screen :is(.recess-pending-notice-list>div,.cb-reminder-spotlight-entry){
+  background:#fffefa!important;border:1px solid #c7b09a!important;color:var(--coffee)!important;
+}
+body.pastel-whole-screen button:not(:disabled){border-radius:12px}
+body.pastel-whole-screen :is(button,input,select,textarea){font-family:inherit}
+body.pastel-whole-screen :is(input:not([type=checkbox]):not([type=radio]),textarea,select){
+  background:#fffefa!important;color:#4d3c31!important;border-color:#bda696!important;
+}
+body.pastel-whole-screen .board-header-clock,
+body.pastel-whole-screen .cb-header-clock{
+  background:#fffefa!important;border:2px solid #b9a393!important;
+  color:#5a4537!important;box-shadow:0 3px 0 #b9a39333!important;
+}
+body.pastel-whole-screen .board-header-clock .board-digital-clock{color:#5c493d!important}
+body.pastel-whole-screen .board-header-clock .board-analog-clock{background:#e5f2fd!important}
+/* 聯絡簿：把原本深綠黑板換成奶油底，保留原有直排與換欄演算法 */
+body.pastel-whole-screen .cb-board{
+  background-color:#fff9ef!important;
+  background-image:radial-gradient(circle,#ffdfcd 2.5px,transparent 3px),radial-gradient(circle,#d6edff 2.5px,transparent 3px)!important;
+  background-size:80px 80px!important;background-position:18px 14px,58px 54px!important;
+  color:var(--coffee)!important;
+}
+body.pastel-whole-screen .cb-top{border-color:#c4a995!important}
+body.pastel-whole-screen .cb-top strong{color:#654d3d!important}
+body.pastel-whole-screen .cb-panel{
+  background:#fffefa!important;border:2px solid #9b806e!important;
+  box-shadow:0 4px 0 #9b806e24!important;border-radius:22px!important;color:#594739!important;
+}
+body.pastel-whole-screen .cb-panel h3{color:#5b4839!important}
+body.pastel-whole-screen .cb-btn{
+  background:#e1f0ff!important;color:#523f32!important;
+  border:2px solid #987f6e!important;box-shadow:0 2px 0 #987f6e22!important;
+}
+body.pastel-whole-screen .cb-btn:hover{background:#c9e5fb!important}
+body.pastel-whole-screen .cb-morning-entry{
+  background:#e2f1ff!important;border:1px solid #b1c9d8!important;color:#503f34!important;
+}
+body.pastel-whole-screen .cb-news-panel .cb-fill-entry{
+  background:#ffe5e9!important;border:1px solid #e1b6c1!important;color:#503f34!important;
+}
+body.pastel-whole-screen .cb-board .cb-morning-entry,
+body.pastel-whole-screen .cb-board .cb-fill-text,
+body.pastel-whole-screen .cb-board .cb-item,
+body.pastel-whole-screen .cb-board .cb-date,
+body.pastel-whole-screen .cb-board .cb-part{
+  color:#513f33!important;
+}
+body.pastel-whole-screen .cb-board .cb-index{color:#a85d76!important}
+body.pastel-whole-screen .cb-board .cb-reminder-tag{background:#fff0c3!important;color:#61452f!important}
+body.pastel-whole-screen .cb-board .cb-empty{color:#8c7767!important}
+body.pastel-whole-screen .cb-board .cb-writing{
+  color:#513f33!important;overflow-x:auto!important;overflow-y:hidden!important;
+  scrollbar-width:thin;scrollbar-color:#bfa493 transparent;
+}
+body.pastel-whole-screen .cb-board .cb-column{
+  color:#513f33!important;text-shadow:none!important;
+}
+body.pastel-whole-screen .cb-board .cb-writing>div:last-child{color:#786153!important}
+body.pastel-whole-screen .cb-board .cb-header-clock{background:#fffefa!important}
+body.pastel-whole-screen .cb-board .cb-clock-date,
+body.pastel-whole-screen .cb-board .cb-clock-weekday,
+body.pastel-whole-screen .cb-board .cb-clock-time{color:#513f33!important}
+body.pastel-whole-screen .cb-dialog{
+  background:#fff9ef!important;color:#513f33!important;border:2px solid #9b806e!important;
+}
+/* 互動工具/教師後台：保留功能與既有欄位，改為柔和紙卡 */
+body.pastel-whole-screen :is(.bg-slate-950,.bg-slate-900,.bg-slate-800){
+  background-color:#fffaf2!important;color:#513f33!important;
+}
+body.pastel-whole-screen .glass-panel :is(.text-white,.text-slate-50){color:#513f33}
+body.pastel-whole-screen :is(button.bg-indigo-600,button.bg-purple-600,button.bg-emerald-600,button.bg-sky-600,button.bg-rose-600,button.bg-pink-600),
+body.pastel-whole-screen :is(button.bg-indigo-600,button.bg-purple-600,button.bg-emerald-600,button.bg-sky-600,button.bg-rose-600,button.bg-pink-600) *{
+  color:white!important;
+}
+@media(max-width:950px){
+  body.pastel-whole-screen .cb-board{padding:10px!important}
+  body.pastel-whole-screen .cb-left{min-width:145px}
+}
+
+
+/* 2026-11-09 芫荽手寫字＋低飽和同色系按鈕。只改視覺，不更動互動與 Firebase。 */
+body.pastel-whole-screen,
+body.pastel-whole-screen :is(button,input,select,textarea),
+body.pastel-whole-screen .cb-font,
+body.pastel-whole-screen .cb-board,
+body.pastel-whole-screen .board-header-clock,
+body.pastel-whole-screen .cb-header-clock {
+  font-family:'Iansui','Noto Sans TC','Microsoft JhengHei',sans-serif!important;
+}
+body.pastel-whole-screen {--ui-focus:#927c91;}
+/* 保留分類辨識度，全部採低飽和淺底＋深字；按鈕與內部圖示一致 */
+body.pastel-whole-screen button:is(.bg-indigo-600,.bg-indigo-500,.bg-indigo-700,.bg-blue-600,.bg-blue-500,.bg-sky-600,.bg-sky-500),
+body.pastel-whole-screen button:is(.bg-indigo-600,.bg-indigo-500,.bg-indigo-700,.bg-blue-600,.bg-blue-500,.bg-sky-600,.bg-sky-500) * {
+  background-color:#dfe9f4!important;color:#344e65!important;border-color:#aebfd0!important;
+}
+body.pastel-whole-screen button:is(.bg-purple-600,.bg-purple-500,.bg-violet-600,.bg-violet-500,.bg-fuchsia-600),
+body.pastel-whole-screen button:is(.bg-purple-600,.bg-purple-500,.bg-violet-600,.bg-violet-500,.bg-fuchsia-600) * {
+  background-color:#e9e2f1!important;color:#59466d!important;border-color:#c5b5d2!important;
+}
+body.pastel-whole-screen button:is(.bg-emerald-800,.bg-emerald-700,.bg-emerald-600,.bg-emerald-500,.bg-teal-700,.bg-teal-600,.bg-teal-500,.bg-green-600),
+body.pastel-whole-screen button:is(.bg-emerald-800,.bg-emerald-700,.bg-emerald-600,.bg-emerald-500,.bg-teal-700,.bg-teal-600,.bg-teal-500,.bg-green-600) * {
+  background-color:#dceee5!important;color:#355b4d!important;border-color:#a9c9ba!important;
+}
+body.pastel-whole-screen button:is(.bg-rose-600,.bg-rose-500,.bg-pink-600,.bg-pink-500,.bg-red-600,.bg-red-500),
+body.pastel-whole-screen button:is(.bg-rose-600,.bg-rose-500,.bg-pink-600,.bg-pink-500,.bg-red-600,.bg-red-500) * {
+  background-color:#f6e0e3!important;color:#7b4856!important;border-color:#d7b4be!important;
+}
+body.pastel-whole-screen button:is(.bg-amber-500,.bg-amber-400,.bg-yellow-500,.bg-orange-500,.bg-orange-600),
+body.pastel-whole-screen button:is(.bg-amber-500,.bg-amber-400,.bg-yellow-500,.bg-orange-500,.bg-orange-600) * {
+  background-color:#f7e9cf!important;color:#725635!important;border-color:#d9c49d!important;
+}
+body.pastel-whole-screen button:is(.bg-slate-700,.bg-slate-600,.bg-slate-800,.bg-gray-700),
+body.pastel-whole-screen button:is(.bg-slate-700,.bg-slate-600,.bg-slate-800,.bg-gray-700) * {
+  background-color:#e8e5e0!important;color:#554b43!important;border-color:#c8bdb2!important;
+}
+/* 常用導覽、聯絡簿按鈕、互動工具統一奶油色系 */
+body.pastel-whole-screen .cb-board .cb-top button.cb-btn,
+body.pastel-whole-screen .cb-board .cb-top button.cb-btn * {
+  background:#dceee5!important;color:#355b4d!important;border-color:#a9c9ba!important;
+}
+body.pastel-whole-screen aside .glass-panel:has(.fa-toolbox) .grid button,
+body.pastel-whole-screen aside .glass-panel:has(.fa-toolbox) .grid button * {
+  background:#dfe9f4!important;color:#344e65!important;border-color:#aebfd0!important;
+}
+body.pastel-whole-screen aside .glass-panel:has(.fa-toolbox) .grid button:nth-child(2),
+body.pastel-whole-screen aside .glass-panel:has(.fa-toolbox) .grid button:nth-child(2) * {
+  background:#e9e2f1!important;color:#59466d!important;border-color:#c5b5d2!important;
+}
+body.pastel-whole-screen aside .glass-panel:has(.fa-toolbox) .grid button:nth-child(3),
+body.pastel-whole-screen aside .glass-panel:has(.fa-toolbox) .grid button:nth-child(3) * {
+  background:#dceee5!important;color:#355b4d!important;border-color:#a9c9ba!important;
+}
+body.pastel-whole-screen button:not(:disabled):hover{filter:brightness(.965)!important}
+body.pastel-whole-screen button:focus-visible{outline:3px solid #927c91!important;outline-offset:2px}
+body.pastel-whole-screen button:disabled{opacity:.52!important}
+/* 徽章也降飽和，但不破壞選取/緊急狀態的語意 */
+body.pastel-whole-screen header span.bg-rose-950\/80{background:#f1dce1!important;color:#754454!important}
+body.pastel-whole-screen header span.bg-emerald-950\/80{background:#d8eee3!important;color:#355b4d!important}
+body.pastel-whole-screen header span.bg-rose-950\/80 *,
+body.pastel-whole-screen header span.bg-emerald-950\/80 *{color:inherit!important}
+/* 防止圖示被舊有白字 !important 規則覆蓋 */
+body.pastel-whole-screen button:is(.bg-indigo-600,.bg-purple-600,.bg-emerald-600,.bg-sky-600,.bg-rose-600,.bg-pink-600,.bg-emerald-800,.bg-emerald-700,.bg-teal-700,.bg-slate-700) :is(i,svg,span){color:inherit!important}
+
+
+/* 2026-11-09 第二次修正：優先處理實際投影時的可讀性 */
+body.pastel-whole-screen { --legible-ink:#45362e; }
+body.pastel-whole-screen .recess-task-chip,
+body.pastel-whole-screen .recess-task-chip *,
+body.pastel-whole-screen .recess-student-card .recess-task-chip,
+body.pastel-whole-screen .recess-student-card .recess-task-chip :is(span,i){
+  color:#42332e!important;text-shadow:none!important;
+}
+body.pastel-whole-screen .recess-task-chip.bg-rose-600{background:#f8dce2!important;border:2px solid #b98391!important}
+body.pastel-whole-screen .recess-task-chip.bg-amber-500{background:#f8e8bb!important;border:2px solid #b99b5f!important}
+body.pastel-whole-screen .recess-task-chip.bg-purple-600{background:#e8dff2!important;border:2px solid #a18bb5!important}
+body.pastel-whole-screen .recess-task-chip :is(span,i){background:transparent!important}
+body.pastel-whole-screen .recess-task-chip{box-shadow:0 2px 3px #46342a25!important}
+body.pastel-whole-screen header button,
+body.pastel-whole-screen header button *,
+body.pastel-whole-screen .student-history-toolbar button,
+body.pastel-whole-screen .student-history-toolbar button *{
+  text-shadow:none!important;
+}
+body.pastel-whole-screen header button.bg-indigo-600,
+body.pastel-whole-screen header button.bg-purple-600,
+body.pastel-whole-screen header button.bg-emerald-800,
+body.pastel-whole-screen header button.bg-emerald-700{
+  background:#e5eaf0!important;color:#42352f!important;border:1.5px solid #a69c98!important;
+}
+body.pastel-whole-screen header button.bg-indigo-600 *,
+body.pastel-whole-screen header button.bg-purple-600 *,
+body.pastel-whole-screen header button.bg-emerald-800 *,
+body.pastel-whole-screen header button.bg-emerald-700 *{color:#42352f!important}
+body.pastel-whole-screen .student-history-toolbar{
+  display:flex!important;gap:8px;align-items:center;justify-content:center;
+  margin-left:auto;flex-shrink:0;
+}
+body.pastel-whole-screen .student-history-toolbar .history-action-btn{
+  background:#e3eee8!important;color:#354b40!important;border:2px solid #91ada0!important;
+  padding:7px 15px;font-size:clamp(13px,1.1vw,17px);font-weight:900;
+  opacity:1!important;
+}
+body.pastel-whole-screen .student-history-toolbar .history-action-btn:disabled{
+  background:#eeebe7!important;color:#7b736d!important;border-color:#c3b9b0!important;
+  opacity:.7!important;
+}
+body.pastel-whole-screen .student-history-toolbar .history-action-btn:not(:disabled):hover{
+  background:#cce5d8!important;
+}
+body.pastel-whole-screen .recess-history-toolbar{margin-left:auto!important}
+/* 調整頂部原本白字的膠囊狀態標籤 */
+body.pastel-whole-screen header :is(.bg-indigo-600,.bg-purple-600,.bg-rose-950\/80,.bg-emerald-950\/80,.bg-slate-700,.bg-amber-500),
+body.pastel-whole-screen header :is(.bg-indigo-600,.bg-purple-600,.bg-rose-950\/80,.bg-emerald-950\/80,.bg-slate-700,.bg-amber-500) :is(span,i,svg){
+  color:#45362e!important;text-shadow:none!important;
+}
+body.pastel-whole-screen aside .glass-panel:has(.fa-bolt) button,
+body.pastel-whole-screen aside .glass-panel:has(.fa-bolt) button *{
+  color:#45362e!important;text-shadow:none!important;
+}
+body.pastel-whole-screen .glass-panel button:not(.recess-task-chip) .text-white{
+  color:inherit!important;
+}
+body.pastel-whole-screen .recess-student-card .recess-inline-name{
+  color:#45362e!important;text-shadow:none!important;
+}
+@media(max-width:1000px){
+ body.pastel-whole-screen .recess-history-toolbar{margin-left:0!important}
+ body.pastel-whole-screen .recess-history-toolbar .history-action-btn{padding:5px 10px}
+}
+
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" rel="stylesheet">
+<style id="refined-theme">
+/* ===== 美化版：統一視覺主題（只改顏色、陰影、圓角、字重；不動版面與功能） ===== */
+:root{
+  --bg:#f2f6f4;--surface:#fff;--ink:#21302b;--ink2:#5f716b;--line:#e0e8e5;
+  --teal:#0f8b78;--teal-d:#0a6a5b;--teal-l:#e2f4ef;
+  --coral:#e5484d;--coral-l:#fff3f3;--amber:#f5a524;--amber-l:#fff8e8;
+  --violet:#7c5cd6;--violet-l:#f6f2ff;--green:#2fb38a;--green-l:#f1faf6;
+  --shadow:0 1px 2px rgba(20,48,40,.05),0 10px 28px -12px rgba(20,48,40,.16);
+  --shadow-sm:0 1px 2px rgba(20,48,40,.06),0 4px 12px -6px rgba(20,48,40,.14);
+}
+html body.pastel-whole-screen{
+  font-family:'Noto Sans TC',-apple-system,'PingFang TC','Microsoft JhengHei',sans-serif!important;
+  color:var(--ink)!important;background-color:var(--bg)!important;
+  background-image:radial-gradient(900px 500px at 8% -10%,#d8f0ea 0%,transparent 60%),radial-gradient(800px 500px at 100% 0%,#ece6fb 0%,transparent 55%),radial-gradient(700px 500px at 60% 110%,#fdeedd 0%,transparent 60%)!important;
+  background-size:auto!important;background-position:0 0!important;background-attachment:fixed!important;
+}
+/* 面板 */
+html body.pastel-whole-screen .glass-panel,
+html body.pastel-whole-screen aside .glass-panel:nth-of-type(n){
+  background:var(--surface)!important;border:1px solid var(--line)!important;
+  border-radius:20px!important;box-shadow:var(--shadow)!important;color:var(--ink)!important;
+}
+html body.pastel-whole-screen header.glass-panel{
+  border-bottom:3px solid var(--teal)!important;border-radius:20px!important;
+}
+html body.pastel-whole-screen .glass-panel :is(h1,h2,h3,h4){color:var(--ink)!important;letter-spacing:.01em}
+html body.pastel-whole-screen header h1{color:var(--teal-d)!important;font-weight:900!important}
+html body.pastel-whole-screen :is(.text-slate-100,.text-slate-200,.text-slate-300,.text-slate-400,.text-slate-500){color:var(--ink2)!important}
+html body.pastel-whole-screen :is(.text-indigo-200,.text-indigo-300,.text-indigo-400){color:var(--teal)!important}
+html body.pastel-whole-screen :is(.bg-slate-900,.bg-slate-800,.bg-slate-950,.bg-slate-900\/90,.bg-slate-900\/80,.bg-slate-900\/70){
+  background:#f1f6f4!important;border-color:var(--line)!important;
+}
+html body.pastel-whole-screen :is(.border-slate-700,.border-slate-800,.border-slate-600,.border-slate-700\/60,.border-slate-700\/80){border-color:var(--line)!important}
+
+/* 按鈕：基礎 */
+html body.pastel-whole-screen button:not(:disabled){
+  font-family:inherit;border-radius:12px!important;cursor:pointer;
+  transition:transform .15s ease,box-shadow .15s ease,background-color .15s ease!important;
+}
+html body.pastel-whole-screen button:hover:not(:disabled){transform:translateY(-1px)}
+html body.pastel-whole-screen button:active:not(:disabled){transform:translateY(0) scale(.98)}
+html body.pastel-whole-screen button:disabled{opacity:.45!important}
+html body.pastel-whole-screen button.bg-slate-700,
+html body.pastel-whole-screen button.bg-slate-800,
+html body.pastel-whole-screen header button.bg-slate-700{
+  background:#fff!important;color:var(--ink)!important;border:1px solid var(--line)!important;box-shadow:var(--shadow-sm)!important;
+}
+html body.pastel-whole-screen button.bg-slate-700 *,html body.pastel-whole-screen header button.bg-slate-700 *{color:var(--ink)!important}
+html body.pastel-whole-screen :is(button,span,label).bg-indigo-600,
+html body.pastel-whole-screen :is(button,span,label).bg-indigo-500,
+html body.pastel-whole-screen header button.bg-emerald-800{
+  background:linear-gradient(180deg,#14a08a,var(--teal))!important;color:#fff!important;
+  border:1px solid var(--teal-d)!important;box-shadow:0 4px 10px -4px rgba(15,139,120,.55)!important;
+}
+html body.pastel-whole-screen :is(button,span,label).bg-indigo-600 *,html body.pastel-whole-screen header button.bg-emerald-800 *{color:#fff!important}
+html body.pastel-whole-screen :is(button,span).bg-amber-500:not(.recess-task-chip),
+html body.pastel-whole-screen :is(button,span).bg-amber-400{
+  background:linear-gradient(180deg,#ffbd45,var(--amber))!important;color:#3a2800!important;border:1px solid #d98e0a!important;
+}
+html body.pastel-whole-screen :is(button,span).bg-amber-500 *,html body.pastel-whole-screen :is(button,span).bg-amber-400 *{color:#3a2800!important}
+html body.pastel-whole-screen :is(button.bg-emerald-600,button.bg-emerald-500){background:var(--green)!important;color:#fff!important;border:1px solid #23966f!important}
+html body.pastel-whole-screen :is(button.bg-rose-600,button.bg-rose-500):not([class*="shrink-0"]){background:var(--coral)!important;color:#fff!important;border:1px solid #c93a3f!important}
+html body.pastel-whole-screen :is(button.bg-purple-600,button.bg-purple-500){background:var(--violet)!important;color:#fff!important;border:1px solid #6547bd!important}
+
+/* 輸入框 */
+html body.pastel-whole-screen :is(input:not([type=checkbox]):not([type=radio]),textarea,select){
+  background:#fff!important;color:var(--ink)!important;border:1px solid #d3dedb!important;
+  border-radius:12px!important;box-shadow:inset 0 1px 2px rgba(20,48,40,.04)!important;
+}
+html body.pastel-whole-screen :is(input,textarea,select):focus{
+  outline:none!important;border-color:var(--teal)!important;box-shadow:0 0 0 3px rgba(15,139,120,.18)!important;
+}
+html body.pastel-whole-screen :is(input,textarea)::placeholder{color:#9aaaa5!important}
+html body.pastel-whole-screen input[type=checkbox],html body.pastel-whole-screen input[type=radio]{accent-color:var(--teal)}
+
+/* 篩選分頁 */
+html body.pastel-whole-screen .rounded-xl.bg-slate-900\/90,
+html body.pastel-whole-screen div.bg-slate-900\/90.p-1{background:#eaf1ee!important;border:1px solid var(--line)!important;border-radius:14px!important}
+
+/* 學生卡片：白底＋狀態色左側色條 */
+html body.pastel-whole-screen .pastel-card:nth-child(n){
+  background:#fff!important;border:1px solid var(--line)!important;border-radius:18px!important;
+  box-shadow:var(--shadow-sm),inset 6px 0 0 var(--green)!important;color:var(--ink)!important;
+}
+html body.pastel-whole-screen .pastel-card[class*="border-emerald-800"]:nth-child(n){background:var(--green-l)!important;border-color:#cfe9df!important}
+html body.pastel-whole-screen .pastel-card[class*="border-rose-600"]:nth-child(n){
+  background:var(--coral-l)!important;border-color:#f6c4c6!important;box-shadow:var(--shadow-sm),inset 6px 0 0 var(--coral)!important}
+html body.pastel-whole-screen .pastel-card[class*="border-amber-500"]:nth-child(n){
+  background:var(--amber-l)!important;border-color:#f5dba4!important;box-shadow:var(--shadow-sm),inset 6px 0 0 var(--amber)!important}
+html body.pastel-whole-screen .pastel-card[class*="border-purple-500"]:nth-child(n){
+  background:var(--violet-l)!important;border-color:#d9cdf5!important;box-shadow:var(--shadow-sm),inset 6px 0 0 var(--violet)!important}
+html body.pastel-whole-screen .pastel-card:hover{box-shadow:var(--shadow),inset 6px 0 0 var(--teal)!important}
+html body.pastel-whole-screen .pastel-card :is(h3,.normal-inline-name){color:var(--ink)!important;font-weight:800!important}
+/* 座號徽章 */
+html body.pastel-whole-screen .pastel-card span.bg-indigo-600{
+  background:var(--teal-l)!important;color:var(--teal-d)!important;border:1px solid #bfe3da!important;box-shadow:none!important;border-radius:10px!important}
+/* 下課大屏卡片 */
+html body.pastel-whole-screen .recess-student-card.pastel-card:nth-child(n){
+  background:linear-gradient(180deg,#fffdf6,var(--amber-l))!important;border:1px solid #f1d899!important;
+  box-shadow:var(--shadow-sm),inset 0 6px 0 var(--amber)!important;color:var(--ink)!important}
+html body.pastel-whole-screen .recess-student-card.pastel-card span.bg-amber-400{
+  background:var(--amber)!important;color:#3a2800!important;border:0!important;border-radius:12px!important;box-shadow:none!important}
+html body.pastel-whole-screen .recess-student-card[class*="bg-yellow-400"]{
+  background:linear-gradient(180deg,#fff6bf,#fde68a)!important;border:1px solid #f0cb52!important;color:var(--ink)!important;box-shadow:var(--shadow-sm)!important}
+html body.pastel-whole-screen .recess-student-card:not(.pastel-card):not([class*="bg-yellow-400"]){background:#fff!important;border:1px solid var(--line)!important}
+
+/* 任務標籤（缺交／訂正／簽名）— 膠囊狀 */
+html body.pastel-whole-screen button.rounded-lg[class*="bg-rose-600"],
+html body.pastel-whole-screen button.rounded-lg[class*="bg-amber-500"],
+html body.pastel-whole-screen button.rounded-lg[class*="bg-purple-600"]{
+  border-radius:999px!important;font-weight:800!important;box-shadow:0 2px 6px -2px rgba(20,48,40,.35)!important;border:0!important}
+html body.pastel-whole-screen button.rounded-lg[class*="bg-rose-600"]{background:var(--coral)!important;color:#fff!important}
+html body.pastel-whole-screen button.rounded-lg[class*="bg-amber-500"]{background:var(--amber)!important;color:#3a2800!important}
+html body.pastel-whole-screen button.rounded-lg[class*="bg-purple-600"]{background:var(--violet)!important;color:#fff!important}
+html body.pastel-whole-screen button.rounded-lg[class*="bg-rose-600"] i,
+html body.pastel-whole-screen button.rounded-lg[class*="bg-purple-600"] i{background:rgba(255,255,255,.28)!important;color:#fff!important}
+html body.pastel-whole-screen button.rounded-lg[class*="bg-amber-500"] i{background:rgba(58,40,0,.16)!important;color:#3a2800!important}
+html body.pastel-whole-screen .pastel-card .bg-emerald-950\/80,
+html body.pastel-whole-screen .bg-emerald-950\/80.text-emerald-300{
+  background:#dff3ea!important;color:#16805e!important;border:1px solid #bfe3d2!important;border-radius:999px!important}
+html body.pastel-whole-screen .bg-emerald-950\/80 *{color:#16805e!important}
+
+/* 公告／提醒區塊 */
+html body.pastel-whole-screen :is(.bg-amber-950\/80,.bg-amber-950\/60,.bg-amber-950\/40){background:var(--amber-l)!important;border-color:#f5dba4!important;color:#6b4a05!important}
+html body.pastel-whole-screen :is(.bg-emerald-950\/40,.bg-emerald-900\/80){background:var(--green-l)!important;border-color:#cfe9df!important;color:#16805e!important}
+html body.pastel-whole-screen :is(.recess-pending-announcements,.cb-reminder-spotlight){
+  background:#fff!important;border:1px solid #f5dba4!important;border-radius:20px!important;box-shadow:var(--shadow)!important}
+
+/* 時鐘 */
+html body.pastel-whole-screen .board-header-clock,html body.pastel-whole-screen .cb-header-clock{
+  background:#f1f6f4!important;border:1px solid var(--line)!important;border-radius:16px!important;box-shadow:none!important;color:var(--ink)!important}
+html body.pastel-whole-screen .board-header-clock .board-digital-clock{color:var(--teal-d)!important}
+html body.pastel-whole-screen .board-header-clock .board-analog-clock{background:#fff!important;border:1px solid #cfdcd8!important}
+
+/* 捲軸 */
+::-webkit-scrollbar-track{background:transparent!important}
+::-webkit-scrollbar-thumb{background:#c5d3ce!important;border-radius:6px}
+::-webkit-scrollbar-thumb:hover{background:#9fb4ad!important}
+
+/* ===== 聯絡簿：紙本筆記本質感 ===== */
+html body.pastel-whole-screen .cb-board{
+  background-color:#f5f3ec!important;
+  background-image:radial-gradient(800px 420px at 10% -10%,#dff1ea,transparent 60%),radial-gradient(700px 420px at 100% 0%,#efe9fb,transparent 55%)!important;
+  background-size:auto!important;background-position:0 0!important;color:var(--ink)!important;
+}
+html body.pastel-whole-screen .cb-top{border-bottom:2px solid var(--teal)!important}
+html body.pastel-whole-screen .cb-top strong{color:var(--teal-d)!important;font-weight:900!important}
+html body.pastel-whole-screen .cb-panel{
+  background:#fff!important;border:1px solid var(--line)!important;border-radius:20px!important;box-shadow:var(--shadow)!important;color:var(--ink)!important}
+html body.pastel-whole-screen .cb-panel h3{color:var(--ink)!important;font-weight:900!important}
+html body.pastel-whole-screen .cb-panel-count{background:var(--teal-l)!important;color:var(--teal-d)!important;border-radius:999px!important}
+html body.pastel-whole-screen .cb-board .cb-top button.cb-btn,
+html body.pastel-whole-screen .cb-btn{
+  background:#fff!important;color:var(--teal-d)!important;border:1px solid #bfe3da!important;
+  border-radius:999px!important;box-shadow:var(--shadow-sm)!important;font-weight:800!important}
+html body.pastel-whole-screen .cb-board .cb-top button.cb-btn:hover,html body.pastel-whole-screen .cb-btn:hover{background:var(--teal-l)!important}
+html body.pastel-whole-screen .cb-board .cb-top button.cb-btn *{color:inherit!important}
+html body.pastel-whole-screen .cb-morning-entry{background:#eaf4ff!important;border:1px solid #c6dcf1!important;color:var(--ink)!important;border-radius:14px!important}
+html body.pastel-whole-screen .cb-news-panel .cb-fill-entry{background:var(--amber-l)!important;border:1px solid #f5dba4!important;color:var(--ink)!important;border-radius:14px!important}
+html body.pastel-whole-screen .cb-board .cb-fill-text{color:var(--ink)!important}
+html body.pastel-whole-screen .cb-board .cb-reminder-tag{background:#fde9b0!important;color:#5b3608!important}
+html body.pastel-whole-screen .cb-board .cb-writing{
+  background:#fffefb!important;border:1px solid var(--line)!important;border-radius:22px!important;
+  box-shadow:var(--shadow),inset 0 0 0 6px #fff,inset 0 0 0 7px #eee9dc!important;padding:16px 22px!important}
+html body.pastel-whole-screen .cb-board :is(.cb-column,.cb-part){color:#26332f!important}
+html body.pastel-whole-screen .cb-board .cb-index{color:var(--coral)!important}
+html body.pastel-whole-screen .cb-board .cb-date{color:var(--teal-d)!important}
+html body.pastel-whole-screen .cb-editor .cb-dialog,html body.pastel-whole-screen .cb-dialog{border-radius:24px!important;border:1px solid var(--line)!important}
+
+/* ===== 修正：按鈕內的文字不要另外有底框，且與按鈕底色有明確對比 ===== */
+html body.pastel-whole-screen button[class*="bg-"] :is(span,i,svg,div,b,strong){
+  background:transparent!important;background-color:transparent!important;
+  border-color:transparent!important;box-shadow:none!important;color:inherit!important;
+}
+/* 文字顏色（按鈕本身）：深色底用白字、淺色底用深字 */
+html body.pastel-whole-screen button:is(.bg-indigo-600,.bg-indigo-500,.bg-emerald-800,.bg-emerald-700,.bg-teal-700){color:#fff!important}
+html body.pastel-whole-screen button:is(.bg-amber-500,.bg-amber-400,.bg-yellow-500){color:#3a2800!important}
+html body.pastel-whole-screen button:is(.bg-slate-700,.bg-slate-800,.bg-slate-600){color:var(--ink)!important}
+/* 數量小徽章：半透明圓點，數字清楚 */
+html body.pastel-whole-screen button[class*="bg-"] span.rounded-full{
+  background:rgba(255,255,255,.28)!important;color:inherit!important;font-weight:900!important;padding-left:7px!important;padding-right:7px!important}
+html body.pastel-whole-screen button:is(.bg-amber-500,.bg-amber-400) span.rounded-full{background:rgba(58,40,0,.14)!important}
+html body.pastel-whole-screen button:is(.bg-slate-700,.bg-slate-800) span.rounded-full{background:var(--teal-l)!important;color:var(--teal-d)!important}
+/* 未選取的分頁：文字清楚、不另外加框 */
+html body.pastel-whole-screen button.text-slate-400:not([class*="bg-"]){color:var(--ink2)!important;background:transparent!important}
+html body.pastel-whole-screen button.text-slate-400:not([class*="bg-"]):hover{color:var(--ink)!important;background:rgba(255,255,255,.7)!important}
+/* 任務標籤內的文字同樣不加底框（打勾圖示維持淡色圓點） */
+html body.pastel-whole-screen button.rounded-lg[class*="bg-rose-600"] span,
+html body.pastel-whole-screen button.rounded-lg[class*="bg-amber-500"] span,
+html body.pastel-whole-screen button.rounded-lg[class*="bg-purple-600"] span{background:transparent!important;box-shadow:none!important}
+
+/* ===== 可愛字體：粉圓體（Huninn）；聯絡簿維持手寫體 ===== */
+html body.pastel-whole-screen{
+  font-family:'Huninn','Iansui','Noto Sans TC',-apple-system,'PingFang TC','Microsoft JhengHei',sans-serif!important;
+  letter-spacing:.02em;
+}
+html body.pastel-whole-screen :is(button,input,select,textarea,h1,h2,h3,h4,label,.font-mono){
+  font-family:inherit!important;
+}
+html body.pastel-whole-screen .font-mono{font-variant-numeric:tabular-nums}
+html body.pastel-whole-screen .cb-font,html body.pastel-whole-screen .cb-font :is(button,input,h3,p,span,strong){
+  font-family:'Iansui','Huninn','DFKai-SB','Noto Sans TC',serif!important;
+}
+
 </style>
 </head>
 <body class="pastel-whole-screen h-screen w-screen overflow-hidden">
@@ -908,6 +1377,11 @@ body.pastel-whole-screen aside .glass-panel:has(.fa-toolbox) .grid button * {
                             <span class="text-xs font-black">下課大屏模式：優先顯示待處理作業（共 {{ displayedStudents.length }} 人；全部依座號排序）</span>
                         </div>
 
+                        <!-- 學生誤觸操作：固定在篩選列右側 -->
+                        <div class="student-history-toolbar" :class="{'recess-history-toolbar': isRecessMode}" aria-label="學生訂正操作紀錄">
+                            <button type="button" @click="undoStudentCheckoff" :disabled="!studentUndoHistory.length" title="復原上一次學生銷號" class="history-action-btn">↶ 上一步 <span v-if="studentUndoHistory.length">{{studentUndoHistory.length}}</span></button>
+                            <button type="button" @click="redoStudentCheckoff" :disabled="!studentRedoHistory.length" title="重新執行剛剛復原的銷號" class="history-action-btn">下一步 ↷ <span v-if="studentRedoHistory.length">{{studentRedoHistory.length}}</span></button>
+                        </div>
                         <!-- 提示訊息 -->
                         <div class="text-xs font-bold flex items-center gap-1.5 ml-auto" :class="isRecessMode ? 'text-amber-300 animate-pulse' : 'text-slate-400'">
                             <i class="fa-solid" :class="isRecessMode ? 'fa-hand-pointer text-amber-400 text-sm' : 'fa-lightbulb text-indigo-400'"></i>
@@ -1313,7 +1787,7 @@ body.pastel-whole-screen aside .glass-panel:has(.fa-toolbox) .grid button * {
         </div>
 
         <!-- Toast 浮動提示 -->
-        <button v-if="!contactBoardOpen && studentUndoHistory.length" class="student-undo-btn" @click="undoStudentCheckoff" title="撤銷上一次學生點選的完成項目">↶ 返回上一步（{{studentUndoHistory.length}}）</button>
+
         <div v-if="toastMessage" class="fixed bottom-6 right-6 bg-slate-900 text-white px-4 py-2.5 rounded-2xl border border-indigo-500/50 shadow-2xl z-50 flex items-center gap-2 text-xs font-bold animate-bounce">
             <i class="fa-solid fa-circle-check text-emerald-400"></i>
             <span>{{ toastMessage }}</span>
@@ -2101,6 +2575,7 @@ body.pastel-whole-screen aside .glass-panel:has(.fa-toolbox) .grid button * {
 
                 // 僅記錄學生自行點選完成的動作；避免誤點其他人的訂正。
                 const studentUndoHistory = ref([]);
+                const studentRedoHistory = ref([]);
                 const undoStudentCheckoff = () => {
                     const last=studentUndoHistory.value.pop();
                     if(!last)return;
@@ -2113,12 +2588,36 @@ body.pastel-whole-screen aside .glass-panel:has(.fa-toolbox) .grid button * {
                     student[last.type].splice(Math.min(last.index,student[last.type].length),0,last.item);
                     if (!student.taskDates) student.taskDates = {};
                     if (last.date) student.taskDates[taskDateKey(last.type,last.item)] = last.date;
+                    studentRedoHistory.value.push(last);
                     saveAllData();
                     showToast(`↶ 已復原 ${student.name} 的【${last.item}】`);
+                };
+                const redoStudentCheckoff = () => {
+                    const last = studentRedoHistory.value.pop();
+                    if (!last) return;
+                    const student = students.value.find(s => String(s.id) === String(last.studentId));
+                    if (!student || !Array.isArray(student[last.type])) {
+                        studentRedoHistory.value.push(last);
+                        showToast('找不到原本的學生或項目，無法重做');
+                        return;
+                    }
+                    const index = student[last.type].indexOf(last.item);
+                    if (index < 0) {
+                        studentRedoHistory.value.push(last);
+                        showToast('該項目已被其他操作移除，無法重做');
+                        return;
+                    }
+                    student[last.type].splice(index, 1);
+                    if (student.taskDates) delete student.taskDates[taskDateKey(last.type,last.item)];
+                    studentUndoHistory.value.push(last);
+                    if (studentUndoHistory.value.length > 12) studentUndoHistory.value.shift();
+                    saveAllData();
+                    showToast(`↷ 已重新完成 ${student.name} 的【${last.item}】`);
                 };
                 const studentSelfCheckoff = (student, type, index) => {
                     if(!Array.isArray(student[type])||index<0||index>=student[type].length)return;
                     const itemName = student[type][index];
+                    studentRedoHistory.value = []; // 新操作發生後，舊的下一步歷史失效
                     studentUndoHistory.value.push({studentId:student.id,type,index,item:itemName,date:student.taskDates?.[taskDateKey(type,itemName)]});
                     if(studentUndoHistory.value.length>12)studentUndoHistory.value.shift();
                     student[type].splice(index, 1);
@@ -2489,7 +2988,7 @@ body.pastel-whole-screen aside .glass-panel:has(.fa-toolbox) .grid button * {
                     getStudentCardStyle,
                     toggleSubject,
                     studentSelfCheckoff,
-                    studentUndoHistory,undoStudentCheckoff,
+                    studentUndoHistory,studentRedoHistory,undoStudentCheckoff,redoStudentCheckoff,
                     clearStudentStatus,
                     clearAllTasks,
                     saveAllData,
